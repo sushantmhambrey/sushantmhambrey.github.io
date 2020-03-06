@@ -5,21 +5,12 @@
     <link>https://sushantmhambrey.github.io/project/</link>
       <atom:link href="https://sushantmhambrey.github.io/project/index.xml" rel="self" type="application/rss+xml" />
     <description>Projects</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 03:28:29 -0600</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Wed, 29 Jan 2020 23:00:49 -0600</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Projects</title>
       <link>https://sushantmhambrey.github.io/project/</link>
     </image>
-    
-    <item>
-      <title>Predicting Real vs Fake Tweets</title>
-      <link>https://sushantmhambrey.github.io/project/nlp/</link>
-      <pubDate>Fri, 06 Mar 2020 03:28:29 -0600</pubDate>
-      <guid>https://sushantmhambrey.github.io/project/nlp/</guid>
-      <description>&lt;p&gt;external_link = &amp;ldquo;&lt;a href=&#34;https://www.kaggle.com/sushant0307/twitter/notebook%22&#34;&gt;https://www.kaggle.com/sushant0307/twitter/notebook&amp;quot;&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
     
     <item>
       <title>Data Pipeline </title>
@@ -51,6 +42,39 @@
       <pubDate>Wed, 29 Jan 2020 22:20:31 -0600</pubDate>
       <guid>https://sushantmhambrey.github.io/project/ai/</guid>
       <description></description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://sushantmhambrey.github.io/project/nlp/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://sushantmhambrey.github.io/project/nlp/</guid>
+      <description>&lt;h2 id=&#34;external_linkhttpswwwkagglecomsushant0307twitternotebook&#34;&gt;external_link=https://www.kaggle.com/sushant0307/twitter/notebook&lt;/h2&gt;
+&lt;h1 id=&#34;documentation-httpssourcethemescomacademicdocsmanaging-content&#34;&gt;Documentation: &lt;a href=&#34;https://sourcethemes.com/academic/docs/managing-content/&#34;&gt;https://sourcethemes.com/academic/docs/managing-content/&lt;/a&gt;&lt;/h1&gt;
+&lt;p&gt;title: &amp;ldquo;NLP&amp;rdquo;
+subtitle: &amp;quot;&amp;rdquo;
+summary: &amp;ldquo;real or fake tweet detection from a handpicked dataset of 10000 tweets using the concepts of natural languauge processing.&amp;rdquo;
+authors: []
+tags: []
+categories: []
+date: 2020-03-06T04:19:38-06:00
+lastmod: 2020-03-06T04:19:38-06:00
+featured: false
+draft: false&lt;/p&gt;
+&lt;h1 id=&#34;featured-image&#34;&gt;Featured image&lt;/h1&gt;
+&lt;h1 id=&#34;to-use-add-an-image-named-featuredjpgpng-to-your-pages-folder&#34;&gt;To use, add an image named &lt;code&gt;featured.jpg/png&lt;/code&gt; to your page&amp;rsquo;s folder.&lt;/h1&gt;
+&lt;h1 id=&#34;focal-points-smart-center-topleft-top-topright-left-right-bottomleft-bottom-bottomright&#34;&gt;Focal points: Smart, Center, TopLeft, Top, TopRight, Left, Right, BottomLeft, Bottom, BottomRight.&lt;/h1&gt;
+&lt;p&gt;image:
+caption: &amp;quot;&amp;rdquo;
+focal_point: &amp;quot;&amp;rdquo;
+preview_only: false&lt;/p&gt;
+&lt;h1 id=&#34;projects-optional&#34;&gt;Projects (optional).&lt;/h1&gt;
+&lt;h1 id=&#34;associate-this-post-with-one-or-more-of-your-projects&#34;&gt;Associate this post with one or more of your projects.&lt;/h1&gt;
+&lt;h1 id=&#34;simply-enter-your-projects-folder-or-file-name-without-extension&#34;&gt;Simply enter your project&amp;rsquo;s folder or file name without extension.&lt;/h1&gt;
+&lt;h1 id=&#34;eg-projects--internal-project-references-contentprojectdeep-learningindexmd&#34;&gt;E.g. &lt;code&gt;projects = [&amp;quot;internal-project&amp;quot;]&lt;/code&gt; references &lt;code&gt;content/project/deep-learning/index.md&lt;/code&gt;.&lt;/h1&gt;
+&lt;h1 id=&#34;otherwise-set-projects--&#34;&gt;Otherwise, set &lt;code&gt;projects = []&lt;/code&gt;.&lt;/h1&gt;
+&lt;h2 id=&#34;projects-&#34;&gt;projects: []&lt;/h2&gt;
+</description>
     </item>
     
   </channel>
