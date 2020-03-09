@@ -52,19 +52,5 @@
       <description></description>
     </item>
     
-    <item>
-      <title>My post&#39;s title</title>
-      <link>https://sushantmhambrey.github.io/post/nlp/</link>
-      <pubDate>Sun, 01 Sep 2019 00:00:00 +0000</pubDate>
-      <guid>https://sushantmhambrey.github.io/post/nlp/</guid>
-      <description>&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print(&amp;quot;hello academic&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-    </item>
-    
   </channel>
 </rss>
