@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Sushant Mhambrey">
+
+  
+  
+  
+    
+  
+  <meta name="description" content="We know that even though linear models can provide good training models rudimentarily, there are lots of situations where the variables don&#39;t reveal a linear relationship.Thus we need to create polynomial models for such datasets.One major issue with polynomial models is that they are suspectible to overfitting.In this article we will look at how a higher degree polynomial model overfits a dataset to create a perfect training environment as opposed to it&#39;s errors introduced while testing on the same degree.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://sushantmhambrey.github.io/post/overfit/index1/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+        
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="https://sushantmhambrey.github.io/post/overfit/index1/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Academic">
+  <meta property="og:url" content="https://sushantmhambrey.github.io/post/overfit/index1/">
+  <meta property="og:title" content="UNDERSTANDING OVERFITTING USING POLYNOMIAL REGRESSION | Academic">
+  <meta property="og:description" content="We know that even though linear models can provide good training models rudimentarily, there are lots of situations where the variables don&#39;t reveal a linear relationship.Thus we need to create polynomial models for such datasets.One major issue with polynomial models is that they are suspectible to overfitting.In this article we will look at how a higher degree polynomial model overfits a dataset to create a perfect training environment as opposed to it&#39;s errors introduced while testing on the same degree."><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="en-us">
+  
+    
+    
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://sushantmhambrey.github.io/post/overfit/index1/"
+  },
+  "headline": "UNDERSTANDING OVERFITTING USING POLYNOMIAL REGRESSION",
+  
+  "datePublished": "0001-01-01T00:00:00Z",
+  "dateModified": "0001-01-01T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Sushant Mhambrey"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Academic",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img/https://sushantmhambrey.github.io/"
+    }
+  },
+  "description": "We know that even though linear models can provide good training models rudimentarily, there are lots of situations where the variables don't reveal a linear relationship.\rThus we need to create polynomial models for such datasets.One major issue with polynomial models is that they are suspectible to overfitting.In this article we will look at how a higher degree polynomial model overfits a dataset to create a perfect training environment as opposed to it's errors introduced while testing on the same degree."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>UNDERSTANDING OVERFITTING USING POLYNOMIAL REGRESSION | Academic</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Academic</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Academic</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-end" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>Home</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#projects"><span>Projects</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#skills"><span>Skills</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/files/cv1.pdf"><span>CV</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link  active" href="/"><span></span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>UNDERSTANDING OVERFITTING USING POLYNOMIAL REGRESSION</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Jan 0001
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    4 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <p style="font-family:Georgia;font-size:18px;background-color:#2455d1;color:white;">
+We know that even though linear models can provide good training models rudimentarily, there are lots of situations where the variables don't reveal a linear relationship.
+Thus we need to create polynomial models for such datasets.One major issue with polynomial models is that they are suspectible to overfitting.In this article we will look at how a higher degree polynomial model overfits a dataset to create a perfect training environment as opposed to it's errors introduced while testing on the same degree.We will further look at how regularization helps to tackel overfitting and what values of hyperparameters produce the best results.</p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Importing the necessary libraries</p>
+<pre><code class="language-python">import math
+import pandas as pd
+import operator
+import numpy as np
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import PolynomialFeatures
+#from sklearn.linear_model import Lasso
+#from sklearn.linear_model import ElasticNet
+from sklearn.pipeline import make_pipeline
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>
+Creating X,Y data pairs.Here x is sampled from a uniform distribution and N from a gaussian normal distribution</p>
+<pre><code class="language-python">#we can change the seed value to get different randome numbers for our x,N values
+np.random.seed(45)
+x=np.random.uniform(low=0,high=1,size=20)
+mu=0
+sigma=1
+#N is based on a gaussian normal distribution
+N=np.random.normal(mu,sigma,size=20)
+y=(np.sin(2*np.pi*x))+N
+</code></pre>
+<pre><code class="language-python">#splitting the dataset into 10 for training and 10 for testing
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.5)
+x_train
+</code></pre>
+<pre><code>array([0.97600332, 0.62739168, 0.44053089, 0.99072168, 0.16332445,
+       0.07728957, 0.28266721, 0.673068  , 0.47280797, 0.048522  ])
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> 
+    Displaying weights of polynomial regression within the table</p>
+  <p> As we can see the polynomial degree of order 9 has coefficients ranging from x to the power 0 up until x to the power 9 ; a total of 10 coefficients </p>
+<pre><code class="language-python">#pip install plotly(plotly not available on some jupyter)
+import plotly.graph_objects as go
+from IPython.display import display
+def give_weights(x,y,degree):
+    poly_coefficients=np.polyfit(x,y,degree)
+    return poly_coefficients
+
+#calling the 'gove_weights' function for degrees of 0,1,6,9
+degree_0=give_weights(x_train,y_train,0)
+degree_1=give_weights(x_train,y_train,1)
+degree_6=give_weights(x_train,y_train,6)
+degree_9=give_weights(x_train,y_train,9)
+
+#creating the table for weights
+coeff=['w0*', 'w1*','w2*', 'w3*', 'w4*', 'w5*', 'w6*', 'w7*', 'w8*','w9*']
+#fig = go.Figure(data=[go.Table(header=dict(values=[' ','M=0', 'M=1','M=3','M=9']),
+#cells=dict(values=[coeff,degree_0,degree_1,degree_6,degree_9])) 
+
+#df = pd.DataFrame(data=numpy_data,columns=[&quot;w0&quot;])
+#print(df)
+
+</code></pre>
+<pre><code class="language-python">#a reference true fit graph to see how our data fits with different polynomial degrees
+x_rn=np.linspace(0,1,100)
+y_rn=(np.sin(2*np.pi*x_rn))
+plt.scatter(x_train,y_train,s=10,color=&quot;red&quot;)
+plt.plot(x_rn,y_rn)
+plt.show()
+</code></pre>
+<p><img src="./index1_9_0.png" alt="png"></p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> 
+ Making the graphs for fit data with the specific degrees ranging from 0 to 9 </p>
+ <p style=font-weight:bold;> We can observe that as we increase the degree of our polynomial regression model , the graph tends to cover all the datapoints leading to overfitting </p>
+<pre><code class="language-python">from sklearn.pipeline import make_pipeline
+#x = np.sort(x_train[:])
+#y=np.sort(y_train[:])
+train_error=[]
+test_error=[] 
+for i in range(10):
+    plt.title('Degree %d' %i)
+    plt.text(0.7, .55, 'M=%d' %i)
+    X = x_train[:, np.newaxis]
+    Y = y_train[:, np.newaxis]
+    X1 = x_test[:,np.newaxis]
+    Y1 = y_test[:,np.newaxis]
+    #we first make use of the linearregression model to observe how it overfits at higher degrees.
+    model = make_pipeline(PolynomialFeatures(i), LinearRegression())
+
+    model.fit(X,Y)
+    y_pred = model.predict(X)
+    mse = (mean_squared_error(Y,y_pred))
+    rmse=math.sqrt(mse)
+    train_error.append(rmse)
+    
+    y_test_pred=model.predict(X1)
+    mse_test= (mean_squared_error(Y1,y_test_pred))
+    rmse_test=math.sqrt(mse_test)
+    test_error.append(rmse_test)
+    #sorting
+    lists=sorted(zip(*[X,y_pred]))
+    X,y_pred = list(zip(*lists))
+    #plotting the models at various degrees.
+    plt.scatter(x_train, y_train,color='black',label='data points')
+    plt.plot(X, y_pred, color='g',label='degree_fit')
+    plt.plot(x_rn,y_rn,color='r',label='true_fit')
+    plt.legend(loc=&quot;lower left&quot;)
+    _=plt.xlabel(&quot;X--&gt;&quot;)
+    _=plt.ylabel(&quot;t--&gt;&quot;)
+    plt.show()
+    
+</code></pre>
+<p><img src="./index1_11_0.png" alt="png"></p>
+<p><img src="./index1_11_1.png" alt="png"></p>
+<p><img src="./index1_11_2.png" alt="png"></p>
+<p><img src="./index1_11_3.png" alt="png"></p>
+<p><img src="./index1_11_4.png" alt="png"></p>
+<p><img src="./index1_11_5.png" alt="png"></p>
+<p><img src="./index1_11_6.png" alt="png"></p>
+<p><img src="./index1_11_7.png" alt="png"></p>
+<p><img src="./index1_11_8.png" alt="png"></p>
+<p><img src="./index1_11_9.png" alt="png"></p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> 
+    Plotting training vs test error
+    </p>
+<pre><code class="language-python">plt.plot(train_error,label='train error')
+plt.plot(test_error,label='test error')
+plt.xticks(np.arange(0, 10, 1.0))
+plt.legend(loc=&quot;upper left&quot;)
+_=plt.xlabel(&quot;M&quot;)
+_=plt.ylabel(&quot;E(RMS)&quot;)
+plt.show()
+</code></pre>
+<p><img src="./index1_13_0.png" alt="png"></p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> 
+    Generating 100 data points and fitting ninth order model on it </p>
+<pre><code class="language-python">#creating 100 data points
+np.random.seed(10)
+x2=np.random.uniform(low=0,high=1,size=100)
+mu=0
+sigma=1
+N2=np.random.normal(mu,sigma,size=100)
+y2=(np.sin(2*np.pi*x2))+N2
+</code></pre>
+<pre><code class="language-python">x_train100, x_test100, y_train100, y_test100 = train_test_split(x2, y2, test_size=0.01)
+</code></pre>
+<pre><code class="language-python">X100 = x_train100[:, np.newaxis]
+Y100 = y_train100[:, np.newaxis]
+model = make_pipeline(PolynomialFeatures(9), LinearRegression())
+
+#fitting the 100 data points of the ninth order model.
+model.fit(X100,Y100)
+y_pred100 = model.predict(X100)
+
+ #sorting
+lists=sorted(zip(*[X100,y_pred100]))
+X100,y_pred100 = list(zip(*lists))
+    
+plt.scatter(x_train100, y_train100,color='#3299a8',label='data points')
+plt.plot(X100, y_pred100, color='r',label='model fit')
+plt.plot(x_rn,y_rn,color='b',label='true fit')
+plt.legend(loc=&quot;lower left&quot;)
+_=plt.xlabel(&quot;X--&gt;&quot;)
+_=plt.ylabel(&quot;Y--&gt;&quot;)
+plt.show()
+</code></pre>
+<p><img src="./index1_17_0.png" alt="png"></p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> Regularisation and graph creation for different values of lambda</p>
+<pre><code class="language-python">lbd=[1, 1/10, 1/100, 1/1000, 1/10000, 1/100000]
+plt.ylim(-2,2)
+train_error2=[]
+test_error2=[]
+for i in range(6):
+    model1= make_pipeline(StandardScaler(),PolynomialFeatures(degree=9), Ridge(alpha=lbd[i],fit_intercept=True))
+    
+    model1.fit(X,Y)
+    y_pred2 = model1.predict(X)
+    mse2 = (mean_squared_error(Y,y_pred2))
+    rmse2=math.sqrt(mse2)
+    train_error2.append(rmse2)
+    
+    y_test_pred2=model1.predict(X1)
+    mse_test2= (mean_squared_error(Y1,y_test_pred2))
+    rmse_test2=math.sqrt(mse_test2)
+    test_error2.append(rmse_test2)
+    
+    lists=sorted(zip(*[X,y_pred2]))
+    X,y_pred2 = list(zip(*lists))
+    
+    plt.scatter(X,Y,color='black')
+    plt.plot(X, y_pred2, color='g')
+    plt.plot(x_rn,y_rn,color='r')
+    _=plt.xlabel(&quot;X--&gt;&quot;)
+    _=plt.ylabel(&quot;t--&gt;&quot;)
+    plt.show()
+    #print('Score: {}'.format(model1.score(X,Y)))
+    #print('Test :{}' .format(model1.score(x_test.reshape(-1,1),y_test.reshape(-1,1))))
+</code></pre>
+<p><img src="./index1_19_0.png" alt="png"></p>
+<p><img src="./index1_19_1.png" alt="png"></p>
+<p><img src="./index1_19_2.png" alt="png"></p>
+<p><img src="./index1_19_3.png" alt="png"></p>
+<p><img src="./index1_19_4.png" alt="png"></p>
+<p><img src="./index1_19_5.png" alt="png"></p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> Plotting Training vs Test values for various lambda </p> 
+<pre><code class="language-python">plt.plot(np.log(lbd),train_error2,label='train error')
+plt.plot(np.log(lbd),test_error2,label='test error')
+#plt.xscale(&quot;log&quot;)
+#plt.xticks(np.arange(0, 1.1, 0.1))
+plt.xlim(-10,0)
+plt.legend(loc=&quot;upper right&quot;)
+_=plt.xlabel(&quot;ln(lambda)&quot;)
+_=plt.ylabel(&quot;E(RMS)&quot;)
+plt.show()
+#print(test_error2)
+</code></pre>
+<p><img src="./index1_21_0.png" alt="png"></p>
+<p style="font-family:Georgia;font-size:16px;background-color:#2455d1;color:white;"> Based on best test perfomance the Ridge model helps us to regularize our overfitting which we could not do throug LinearRegression. We observe that as the model complexity increases,bias decreases and variance increases and vice versa.Also,we can see that as the lambda value decreases we get a good training score and we obtain the best training score for lambda =1/100000.But thats not the case with the testing score.Before we regularise, we see that the model of degree 9 fits all the data points but leads to overfitting.So a polynoial regression model of degree 6 will be best amongst what we tried without leading to overfit.Also after we regularize we see that the lambda values are almost constant before increasing so the model with lambda 1/1000 seems to be the best </p>
+<pre><code class="language-python">
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://sushantmhambrey.github.io/post/overfit/index1/&amp;text=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://sushantmhambrey.github.io/post/overfit/index1/&amp;t=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION&amp;body=https://sushantmhambrey.github.io/post/overfit/index1/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://sushantmhambrey.github.io/post/overfit/index1/&amp;title=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION%20https://sushantmhambrey.github.io/post/overfit/index1/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://sushantmhambrey.github.io/post/overfit/index1/&amp;title=UNDERSTANDING%20OVERFITTING%20USING%20POLYNOMIAL%20REGRESSION" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  
+  
+    
+  
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <img class="avatar mr-3 avatar-circle" src="/authors/admin/avatar_hu1739f3142890920234273aae3e22735e_279817_270x270_fill_q90_lanczos_center.jpg" alt="Avatar">
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="https://sushantmhambrey.github.io/">Sushant Mhambrey</a></h5>
+      <h6 class="card-subtitle">Student, Masters of Science in Computer Science</h6>
+      <p class="card-text">My research interests include distributed robotics, mobile computing and programmable matter.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+    <li>
+      <a href="mailto:sushantshirish.mhambrey@mavs.uta.edu" >
+        <i class="fas fa-envelope"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://www.linkedin.com/in/sushant-mhambrey-2b23731a0/" target="_blank" rel="noopener">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </li>
+  
+    
+    
+    
+      
+    
+    
+    
+    
+    
+      
+    
+    <li>
+      <a href="https://github.com/sushantmhambrey" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+      </a>
+    </li>
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
