@@ -38,12 +38,17 @@
   </url>
   
   <url>
-    <loc>https://sushantmhambrey.github.io/authors/admin/</loc>
+    <loc>https://sushantmhambrey.github.io/post/nlp1/</loc>
+    <lastmod>2019-09-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://sushantmhambrey.github.io/post/nlp1/</loc>
-    <priority>0</priority>
+    <loc>https://sushantmhambrey.github.io/post/</loc>
+    <lastmod>2019-09-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://sushantmhambrey.github.io/authors/admin/</loc>
   </url>
   
   <url>
@@ -52,10 +57,6 @@
   
   <url>
     <loc>https://sushantmhambrey.github.io/categories/</loc>
-  </url>
-  
-  <url>
-    <loc>https://sushantmhambrey.github.io/post/</loc>
   </url>
   
   <url>
