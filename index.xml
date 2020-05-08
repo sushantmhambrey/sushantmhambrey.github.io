@@ -5,20 +5,12 @@
     <link>https://sushantmhambrey.github.io/</link>
       <atom:link href="https://sushantmhambrey.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>Sushant Mhambrey</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 08 May 2020 05:15:48 -0500</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 04:19:38 -0600</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Sushant Mhambrey</title>
       <link>https://sushantmhambrey.github.io/</link>
     </image>
-    
-    <item>
-      <title>Assignment3</title>
-      <link>https://sushantmhambrey.github.io/post/assn3/</link>
-      <pubDate>Fri, 08 May 2020 05:15:48 -0500</pubDate>
-      <guid>https://sushantmhambrey.github.io/post/assn3/</guid>
-      <description> &lt;iframe src=&#34;https://sushantmhambrey.github.io/Mhambrey_03.html&#34; width=&#34;100%&#34;height=&#34;150&#34; style=&#34;border:none;&#34; name=&#34;iframe&#34;&gt;&lt;/iframe&gt;</description>
-    </item>
     
     <item>
       <title>NLP</title>
