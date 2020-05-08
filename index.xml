@@ -5,12 +5,1524 @@
     <link>https://sushantmhambrey.github.io/</link>
       <atom:link href="https://sushantmhambrey.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>Sushant Mhambrey</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 04:19:38 -0600</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Sushant Mhambrey</title>
       <link>https://sushantmhambrey.github.io/</link>
     </image>
+    
+    <item>
+      <title>Naive Bayes from Scratch</title>
+      <link>https://sushantmhambrey.github.io/post/assn3/</link>
+      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://sushantmhambrey.github.io/post/assn3/</guid>
+      <description>&lt;p style=background-color:#ff7814;font-weight:bold;font-size:16px;text-align:center;&gt; IMPLEMENTING NAIVE BAYES FROM SCRATCH USING MOVIE REVIEW DATASET&lt;/p&gt;
+&lt;p style=&#34;font-family:Georgia;font-size:18px;background-color:#2455d1;color:white;&#34;&gt;Naive Bayes is one of the most common ML algorithms that is often used for the purpose of text classification. If you have just stepped into ML, it is one of the easiest classification algorithms to start with. Naive Bayes is a probabilistic classification algorithm as it uses probability to make predictions for the purpose of classification.&lt;/p&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Importing the necessary libraries&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np
+import pandas as pd
+import os
+import string
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sys import path 
+from os import listdir
+from os.path import join
+import re
+def Load_Text_Files(dir_path):
+    #dir_path=path[0]
+    dir_path=review_dir_path
+    for file in listdir(dir_path):
+        if &#39;.txt&#39; in file:
+            paths = [join(dir_path,data)]
+    docs = []
+    for path in paths:
+        with open(path, &#39;r&#39;) as file: docs.append(file.read())
+    return docs
+
+def Clean(review):
+    p=re.sub(re.compile(&#39;&amp;lt;.*?&amp;gt;&#39;),&#39;&#39;,review)
+    rev=re.sub(&#39;[^0-9a-zA-Z]+&#39;, &#39; &#39;, review.lower())
+    return rev
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import glob
+data_train=[]
+for file in glob.glob(os.path.join(&#39;train/neg/&#39;,&#39;*.txt&#39;)):
+    f = open(file,&#39;r&#39;,encoding=&amp;quot;utf8&amp;quot;)
+    review = f.read()
+    data_train.append([review,0])
+    
+for file in glob.glob(os.path.join(&#39;train/pos/&#39;,&#39;*.txt&#39;)):
+    f = open(file,&#39;r&#39;,encoding=&amp;quot;utf8&amp;quot;)
+    review = f.read()
+    data_train.append([review,1])
+
+data_train = pd.DataFrame(data_train)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;data_train.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;th&gt;1&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;Story of a man who has unnatural feelings for ...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;OK its not the best film I&#39;ve ever seen but at...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;Amateur, no budget films can be surprisingly g...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;My girlfriend once brought around The Zombie C...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;Without wishing to be a killjoy, Brad Sykes is...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;data_test=[]
+for file in glob.glob(os.path.join(&#39;test/neg/&#39;,&#39;*.txt&#39;)):
+    f = open(file,&#39;r&#39;,encoding=&amp;quot;utf8&amp;quot;)
+    review = f.read()
+    data_test.append([review,0])
+    
+for file in glob.glob(os.path.join(&#39;test/pos/&#39;,&#39;*.txt&#39;)):
+    f = open(file,&#39;r&#39;,encoding=&amp;quot;utf8&amp;quot;)
+    review = f.read()
+    data_test.append([review,1])
+#appended values 0 and 1 represents negative and positive reviews about movies, respectively
+
+data_test = pd.DataFrame(data_test)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;data_test.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;th&gt;1&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0&lt;/td&gt;
+      &lt;td&gt;Once again Mr. Costner has dragged out a movie...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;I was looking forward to this movie. Trustwort...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;I gave this a 3 out of a possible 10 stars.&amp;lt;br...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;I of course saw the previews for this at the b...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;too bad this movie isn&#39;t. While &#34;Nemesis Game&#34;...&lt;/td&gt;
+      &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;
+Converting the data frames to arrays for training and testing data &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X_train=data_train.iloc[:,0].values
+Y_train=data_train.iloc[:,1].values
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X_test=data_test.iloc[:,0].values
+Y_test=data_test.iloc[:,1].values
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#print(X_train[3])
+#print(X_test[30])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p &lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt; Cleaning the X_train and X_test &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;for i in range(len(X_train)):
+    X_train[i]=Clean(X_train[i])
+print(X_train[3])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;my girlfriend once brought around the zombie chronicles for us to watch as a joke little did we realize the joke was on her for paying 1 for it while watching this film i started to come up with things i would rather be doing than watching the zombie chronicles these included br br 1 drinking bleach 2 rubbing sand in my eyes 3 writing a letter to brad sykes and garrett clancy 4 re enacting the american civil war 5 tax returns 6 gcse maths 7 sex with an old lady br br garrett clancy aka sgt ben draper wrote this the guy couldn t even dig a hole properly the best ting he did was kick a door down the best part of the film this was the worst film i have ever seen and i ve seen white noise the light never has a film had so many mistakes in it my girlfriend left it here so now i live with the shame of owning this piece of crap br br news just in owen wilson watched this film and tried to kill himself fact br br do not watch
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;for i in range(len(X_test)):
+    X_test[i]=Clean(X_test[i])
+#printX_test[30]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p &lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Diving the training data into training and development data &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.model_selection import train_test_split
+X_train,X_dev,Y_train,Y_dev=train_test_split(X_train,Y_train,test_size=0.2)
+#x_train[10]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Making the vocabulary for the data&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def build_freq_and_vocab(X):
+    #vocab=set()
+    vocab={}
+    for val in X:
+        revs=val.split()
+        for word in revs:
+            if word not in vocab:
+                vocab[word]=1
+            else:
+                vocab[word]+=1
+    return(vocab)
+
+word_vocab=build_freq_and_vocab(X_train)
+#len(word_vocab)
+#word_vocab[&#39;idea&#39;]
+
+less_than_five=[]
+for i in word_vocab.keys():
+    #print(i)
+    if(word_vocab[i]&amp;lt;5):
+         less_than_five.append(i)
+#print(len(less_than_fove))
+for i in less_than_five:
+    del word_vocab[i]
+#len(word_vocab)     
+#X_train[0]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Dispaying the vocabulary of words&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;word_vocab
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;{&#39;in&#39;: 2939,
+ &#39;today&#39;: 29,
+ &#39;s&#39;: 1795,
+ &#39;world&#39;: 129,
+ &#39;of&#39;: 4371,
+ &#39;digital&#39;: 5,
+ &#39;there&#39;: 550,
+ &#39;is&#39;: 3175,
+ &#39;no&#39;: 370,
+ &#39;computer&#39;: 18,
+ &#39;than&#39;: 281,
+ &#39;can&#39;: 446,
+ &#39;the&#39;: 9911,
+ &#39;actor&#39;: 90,
+ &#39;and&#39;: 4979,
+ &#39;writer&#39;: 29,
+ &#39;alas&#39;: 9,
+ &#39;this&#39;: 2326,
+ &#39;type&#39;: 39,
+ &#39;character&#39;: 222,
+ &#39;driven&#39;: 7,
+ &#39;film&#39;: 1258,
+ &#39;far&#39;: 98,
+ &#39;too&#39;: 235,
+ &#39;rare&#39;: 11,
+ &#39;these&#39;: 183,
+ &#39;days&#39;: 45,
+ &#39;duvall&#39;: 9,
+ &#39;performance&#39;: 86,
+ &#39;as&#39;: 1337,
+ &#39;well&#39;: 282,
+ &#39;james&#39;: 31,
+ &#39;earl&#39;: 19,
+ &#39;jones&#39;: 25,
+ &#39;are&#39;: 919,
+ &#39;to&#39;: 3989,
+ &#39;their&#39;: 348,
+ &#39;audience&#39;: 74,
+ &#39;high&#39;: 68,
+ &#39;expectations&#39;: 7,
+ &#39;i&#39;: 2715,
+ &#39;wonder&#39;: 31,
+ &#39;if&#39;: 494,
+ &#39;movie&#39;: 1238,
+ &#39;was&#39;: 1457,
+ &#39;made&#39;: 256,
+ &#39;for&#39;: 1322,
+ &#39;tv&#39;: 68,
+ &#39;it&#39;: 2932,
+ &#39;has&#39;: 497,
+ &#39;a&#39;: 4792,
+ &#39;close&#39;: 37,
+ &#39;up&#39;: 364,
+ &#39;personal&#39;: 25,
+ &#39;quality&#39;: 42,
+ &#39;narrative&#39;: 17,
+ &#39;an&#39;: 681,
+ &#39;say&#39;: 163,
+ &#39;that&#39;: 2191,
+ &#39;performances&#39;: 49,
+ &#39;all&#39;: 737,
+ &#39;outstanding&#39;: 12,
+ &#39;only&#39;: 369,
+ &#39;thing&#39;: 142,
+ &#39;keeps&#39;: 15,
+ &#39;from&#39;: 623,
+ &#39;being&#39;: 210,
+ &#39;cinema&#39;: 59,
+ &#39;masterpiece&#39;: 27,
+ &#39;lack&#39;: 27,
+ &#39;great&#39;: 276,
+ &#39;but&#39;: 1254,
+ &#39;pretty&#39;: 88,
+ &#39;pictures&#39;: 14,
+ &#39;not&#39;: 885,
+ &#39;everything&#39;: 74,
+ &#39;how&#39;: 268,
+ &#39;talent&#39;: 27,
+ &#39;likes&#39;: 16,
+ &#39;continue&#39;: 11,
+ &#39;produce&#39;: 10,
+ &#39;such&#39;: 157,
+ &#39;fine&#39;: 49,
+ &#39;work&#39;: 148,
+ &#39;age&#39;: 38,
+ &#39;where&#39;: 146,
+ &#39;actors&#39;: 156,
+ &#39;excellent&#39;: 71,
+ &#39;with&#39;: 1268,
+ &#39;extraordinary&#39;: 5,
+ &#39;cast&#39;: 123,
+ &#39;acting&#39;: 204,
+ &#39;very&#39;: 431,
+ &#39;disappointed&#39;: 26,
+ &#39;academy&#39;: 16,
+ &#39;when&#39;: 458,
+ &#39;didn&#39;: 143,
+ &#39;t&#39;: 1029,
+ &#39;get&#39;: 265,
+ &#39;oscar&#39;: 40,
+ &#39;best&#39;: 192,
+ &#39;actress&#39;: 64,
+ &#39;goldberg&#39;: 24,
+ &#39;certainly&#39;: 32,
+ &#39;deserved&#39;: 14,
+ &#39;any&#39;: 218,
+ &#39;case&#39;: 40,
+ &#39;take&#39;: 115,
+ &#39;look&#39;: 102,
+ &#39;at&#39;: 700,
+ &#39;am&#39;: 86,
+ &#39;sure&#39;: 78,
+ &#39;you&#39;: 1025,
+ &#39;will&#39;: 270,
+ &#39;enjoy&#39;: 45,
+ &#39;much&#39;: 292,
+ &#39;films&#39;: 237,
+ &#39;fill&#39;: 10,
+ &#39;subject&#39;: 30,
+ &#39;matter&#39;: 32,
+ &#39;so&#39;: 635,
+ &#39;after&#39;: 223,
+ &#39;watching&#39;: 147,
+ &#39;trailer&#39;: 7,
+ &#39;water&#39;: 11,
+ &#39;expected&#39;: 23,
+ &#39;like&#39;: 583,
+ &#39;because&#39;: 283,
+ &#39;thought&#39;: 104,
+ &#39;d&#39;: 88,
+ &#39;on&#39;: 1058,
+ &#39;something&#39;: 131,
+ &#39;unique&#39;: 22,
+ &#39;honestly&#39;: 16,
+ &#39;portrays&#39;: 11,
+ &#39;teen&#39;: 24,
+ &#39;lesbian&#39;: 13,
+ &#39;love&#39;: 273,
+ &#39;sort&#39;: 32,
+ &#39;female&#39;: 42,
+ &#39;version&#39;: 51,
+ &#39;beautiful&#39;: 77,
+ &#39;br&#39;: 3152,
+ &#39;main&#39;: 70,
+ &#39;characters&#39;: 200,
+ &#39;young&#39;: 114,
+ &#39;french&#39;: 24,
+ &#39;women&#39;: 95,
+ &#39;15&#39;: 13,
+ &#39;years&#39;: 143,
+ &#39;old&#39;: 159,
+ &#39;marie&#39;: 17,
+ &#39;way&#39;: 240,
+ &#39;floriane&#39;: 7,
+ &#39;erotic&#39;: 8,
+ &#39;between&#39;: 111,
+ &#39;always&#39;: 85,
+ &#39;surface&#39;: 11,
+ &#39;then&#39;: 227,
+ &#39;just&#39;: 550,
+ &#39;below&#39;: 8,
+ &#39;however&#39;: 98,
+ &#39;about&#39;: 524,
+ &#39;upon&#39;: 32,
+ &#39;two&#39;: 243,
+ &#39;sexual&#39;: 28,
+ &#39;frustration&#39;: 5,
+ &#39;suffering&#39;: 13,
+ &#39;working&#39;: 34,
+ &#39;cross&#39;: 6,
+ &#39;purposes&#39;: 8,
+ &#39;least&#39;: 99,
+ &#39;sex&#39;: 63,
+ &#39;also&#39;: 274,
+ &#39;proves&#39;: 10,
+ &#39;makers&#39;: 17,
+ &#39;own&#39;: 92,
+ &#39;they&#39;: 677,
+ &#39;become&#39;: 53,
+ &#39;extra&#39;: 8,
+ &#39;features&#39;: 12,
+ &#39;lord&#39;: 6,
+ &#39;dvd&#39;: 71,
+ &#39;director&#39;: 153,
+ &#39;peter&#39;: 34,
+ &#39;says&#39;: 34,
+ &#39;cynicism&#39;: 5,
+ &#39;starts&#39;: 35,
+ &#39;meaning&#39;: 10,
+ &#39;regard&#39;: 5,
+ &#39;children&#39;: 41,
+ &#39;while&#39;: 138,
+ &#39;adults&#39;: 11,
+ &#39;part&#39;: 125,
+ &#39;maker&#39;: 6,
+ &#39;joy&#39;: 20,
+ &#39;asked&#39;: 11,
+ &#39;myself&#39;: 42,
+ &#39;yes&#39;: 43,
+ &#39;first&#39;: 274,
+ &#39;be&#39;: 850,
+ &#39;painful&#39;: 14,
+ &#39;fresh&#39;: 11,
+ &#39;life&#39;: 230,
+ &#39;positive&#39;: 18,
+ &#39;aspects&#39;: 8,
+ &#39;missing&#39;: 20,
+ &#39;balance&#39;: 7,
+ &#39;wants&#39;: 33,
+ &#39;poignant&#39;: 6,
+ &#39;celebration&#39;: 5,
+ &#39;impressed&#39;: 11,
+ &#39;her&#39;: 687,
+ &#39;ruins&#39;: 7,
+ &#39;what&#39;: 451,
+ &#39;point&#39;: 77,
+ &#39;showing&#39;: 17,
+ &#39;girl&#39;: 81,
+ &#39;nude&#39;: 9,
+ &#39;know&#39;: 179,
+ &#39;established&#39;: 5,
+ &#39;tasteful&#39;: 5,
+ &#39;nudity&#39;: 29,
+ &#39;european&#39;: 8,
+ &#39;by&#39;: 653,
+ &#39;devil&#39;: 16,
+ &#39;probably&#39;: 70,
+ &#39;little&#39;: 178,
+ &#39;heart&#39;: 41,
+ &#39;friends&#39;: 52,
+ &#39;europa&#39;: 57,
+ &#39;instance&#39;: 5,
+ &#39;see&#39;: 359,
+ &#39;make&#39;: 217,
+ &#39;show&#39;: 212,
+ &#39;unattractive&#39;: 5,
+ &#39;person&#39;: 52,
+ &#39;either&#39;: 58,
+ &#39;or&#39;: 487,
+ &#39;would&#39;: 388,
+ &#39;ve&#39;: 157,
+ &#39;been&#39;: 288,
+ &#39;honest&#39;: 16,
+ &#39;go&#39;: 118,
+ &#39;scene&#39;: 163,
+ &#39;club&#39;: 13,
+ &#39;dancing&#39;: 23,
+ &#39;follows&#39;: 14,
+ &#39;next&#39;: 51,
+ &#39;perhaps&#39;: 72,
+ &#39;biggest&#39;: 13,
+ &#39;honesty&#39;: 7,
+ &#39;takes&#39;: 63,
+ &#39;place&#39;: 72,
+ &#39;she&#39;: 524,
+ &#39;normal&#39;: 11,
+ &#39;asks&#39;: 13,
+ &#39;who&#39;: 654,
+ &#39;cares&#39;: 9,
+ &#39;plays&#39;: 73,
+ &#39;false&#39;: 9,
+ &#39;question&#39;: 17,
+ &#39;authentic&#39;: 10,
+ &#39;heartfelt&#39;: 5,
+ &#39;viewers&#39;: 35,
+ &#39;time&#39;: 371,
+ &#39;deserve&#39;: 16,
+ &#39;here&#39;: 160,
+ &#39;moments&#39;: 38,
+ &#39;which&#39;: 319,
+ &#39;viewer&#39;: 40,
+ &#39;1&#39;: 55,
+ &#39;since&#39;: 76,
+ &#39;do&#39;: 251,
+ &#39;people&#39;: 285,
+ &#39;wearing&#39;: 6,
+ &#39;suits&#39;: 6,
+ &#39;turtle&#39;: 8,
+ &#39;boot&#39;: 5,
+ &#39;2&#39;: 89,
+ &#39;down&#39;: 96,
+ &#39;core&#39;: 5,
+ &#39;thrown&#39;: 16,
+ &#39;garbage&#39;: 13,
+ &#39;order&#39;: 27,
+ &#39;taste&#39;: 9,
+ &#39;beloved&#39;: 5,
+ &#39;mouth&#39;: 13,
+ &#39;three&#39;: 80,
+ &#39;actresses&#39;: 32,
+ &#39;find&#39;: 129,
+ &#39;better&#39;: 159,
+ &#39;talents&#39;: 13,
+ &#39;may&#39;: 92,
+ &#39;terms&#39;: 18,
+ &#39;technique&#39;: 7,
+ &#39;could&#39;: 244,
+ &#39;have&#39;: 850,
+ &#39;successful&#39;: 17,
+ &#39;career&#39;: 30,
+ &#39;supporting&#39;: 30,
+ &#39;roles&#39;: 47,
+ &#39;leading&#39;: 20,
+ &#39;lady&#39;: 35,
+ &#39;both&#39;: 96,
+ &#39;intensity&#39;: 10,
+ &#39;future&#39;: 30,
+ &#39;play&#39;: 65,
+ &#39;emotionally&#39;: 7,
+ &#39;rise&#39;: 6,
+ &#39;disappointing&#39;: 16,
+ &#39;please&#39;: 49,
+ &#39;falling&#39;: 13,
+ &#39;necessarily&#39;: 11,
+ &#39;middle&#39;: 23,
+ &#39;aged&#39;: 9,
+ &#39;guy&#39;: 85,
+ &#39;girls&#39;: 68,
+ &#39;watch&#39;: 203,
+ &#39;identify&#39;: 9,
+ &#39;wonderful&#39;: 61,
+ &#39;new&#39;: 127,
+ &#39;crime&#39;: 27,
+ &#39;series&#39;: 101,
+ &#39;bringing&#39;: 7,
+ &#39;together&#39;: 75,
+ &#39;british&#39;: 17,
+ &#39;television&#39;: 30,
+ &#39;armstrong&#39;: 8,
+ &#39;retired&#39;: 9,
+ &#39;detectives&#39;: 9,
+ &#39;brought&#39;: 32,
+ &#39;back&#39;: 136,
+ &#39;help&#39;: 36,
+ &#39;clear&#39;: 23,
+ &#39;cases&#39;: 6,
+ &#39;under&#39;: 35,
+ &#39;younger&#39;: 16,
+ &#39;focused&#39;: 7,
+ &#39;amanda&#39;: 6,
+ &#39;quirky&#39;: 5,
+ &#39;cops&#39;: 11,
+ &#39;brilliant&#39;: 39,
+ &#39;team&#39;: 29,
+ &#39;twenty&#39;: 16,
+ &#39;year&#39;: 87,
+ &#39;police&#39;: 38,
+ &#39;force&#39;: 8,
+ &#39;moved&#39;: 20,
+ &#39;long&#39;: 105,
+ &#39;sometimes&#39;: 43,
+ &#39;effect&#39;: 39,
+ &#39;other&#39;: 284,
+ &#39;times&#39;: 92,
+ &#39;horror&#39;: 84,
+ &#39;portrayed&#39;: 21,
+ &#39;comic&#39;: 29,
+ &#39;scenes&#39;: 142,
+ &#39;some&#39;: 483,
+ &#39;moving&#39;: 31,
+ &#39;ones&#39;: 26,
+ &#39;each&#39;: 82,
+ &#39;come&#39;: 95,
+ &#39;growing&#39;: 11,
+ &#39;end&#39;: 155,
+ &#39;six&#39;: 10,
+ &#39;we&#39;: 301,
+ &#39;further&#39;: 25,
+ &#39;had&#39;: 330,
+ &#39;developed&#39;: 11,
+ &#39;cannot&#39;: 44,
+ &#39;his&#39;: 783,
+ &#39;wife&#39;: 51,
+ &#39;death&#39;: 64,
+ &#39;learning&#39;: 5,
+ &#39;accept&#39;: 11,
+ &#39;role&#39;: 94,
+ &#39;grandfather&#39;: 15,
+ &#39;even&#39;: 390,
+ &#39;helped&#39;: 9,
+ &#39;fight&#39;: 32,
+ &#39;past&#39;: 41,
+ &#39;keep&#39;: 54,
+ &#39;taking&#39;: 37,
+ &#39;face&#39;: 52,
+ &#39;familiar&#39;: 29,
+ &#39;conflict&#39;: 10,
+ &#39;having&#39;: 64,
+ &#39;story&#39;: 429,
+ &#39;lines&#39;: 49,
+ &#39;interesting&#39;: 118,
+ &#39;rather&#39;: 85,
+ &#39;heavily&#39;: 10,
+ &#39;four&#39;: 40,
+ &#39;finest&#39;: 9,
+ &#39;failure&#39;: 8,
+ &#39;box&#39;: 17,
+ &#39;office&#39;: 9,
+ &#39;b&#39;: 32,
+ &#39;demille&#39;: 11,
+ &#39;stopped&#39;: 7,
+ &#39;doing&#39;: 55,
+ &#39;non&#39;: 24,
+ &#39;american&#39;: 82,
+ &#39;history&#39;: 49,
+ &#39;were&#39;: 357,
+ &#39;our&#39;: 75,
+ &#39;jean&#39;: 20,
+ &#39;war&#39;: 62,
+ &#39;ii&#39;: 6,
+ &#39;dr&#39;: 8,
+ &#39;production&#39;: 45,
+ &#39;starring&#39;: 22,
+ &#39;gary&#39;: 9,
+ &#39;cooper&#39;: 17,
+ &#39;wild&#39;: 22,
+ &#39;bill&#39;: 26,
+ &#39;hickok&#39;: 10,
+ &#39;arthur&#39;: 14,
+ &#39;calamity&#39;: 10,
+ &#39;jane&#39;: 21,
+ &#39;buffalo&#39;: 12,
+ &#39;john&#39;: 56,
+ &#39;villain&#39;: 11,
+ &#39;usual&#39;: 20,
+ &#39;general&#39;: 26,
+ &#39;george&#39;: 43,
+ &#39;custer&#39;: 7,
+ &#39;one&#39;: 835,
+ &#39;indians&#39;: 5,
+ &#39;big&#39;: 117,
+ &#39;villains&#39;: 7,
+ &#39;led&#39;: 11,
+ &#39;charles&#39;: 10,
+ &#39;selling&#39;: 6,
+ &#39;arms&#39;: 5,
+ &#39;hall&#39;: 7,
+ &#39;jack&#39;: 15,
+ &#39;killed&#39;: 30,
+ &#39;basically&#39;: 22,
+ &#39;u&#39;: 16,
+ &#39;civil&#39;: 8,
+ &#39;lincoln&#39;: 9,
+ &#39;shown&#39;: 44,
+ &#39;start&#39;: 43,
+ &#39;talking&#39;: 22,
+ &#39;step&#39;: 10,
+ &#39;now&#39;: 144,
+ &#39;lee&#39;: 12,
+ &#39;talks&#39;: 8,
+ &#39;need&#39;: 53,
+ &#39;west&#39;: 17,
+ &#39;more&#39;: 485,
+ &#39;later&#39;: 80,
+ &#39;he&#39;: 828,
+ &#39;theater&#39;: 17,
+ &#39;april&#39;: 32,
+ &#39;must&#39;: 91,
+ &#39;busy&#39;: 24,
+ &#39;city&#39;: 24,
+ &#39;same&#39;: 133,
+ &#39;date&#39;: 16,
+ &#39;actually&#39;: 104,
+ &#39;concerned&#39;: 12,
+ &#39;immediate&#39;: 5,
+ &#39;thoughts&#39;: 6,
+ &#39;last&#39;: 93,
+ &#39;day&#39;: 99,
+ &#39;former&#39;: 20,
+ &#39;states&#39;: 7,
+ &#39;into&#39;: 260,
+ &#39;union&#39;: 7,
+ &#39;soon&#39;: 36,
+ &#39;possible&#39;: 32,
+ &#39;attention&#39;: 30,
+ &#39;except&#39;: 22,
+ &#39;problems&#39;: 25,
+ &#39;forces&#39;: 12,
+ &#39;mexico&#39;: 7,
+ &#39;against&#39;: 41,
+ &#39;involved&#39;: 25,
+ &#39;actual&#39;: 24,
+ &#39;sent&#39;: 9,
+ &#39;loser&#39;: 5,
+ &#39;second&#39;: 58,
+ &#39;put&#39;: 83,
+ &#39;serious&#39;: 40,
+ &#39;indian&#39;: 6,
+ &#39;novel&#39;: 29,
+ &#39;lake&#39;: 18,
+ &#39;jackson&#39;: 6,
+ &#39;turned&#39;: 25,
+ &#39;out&#39;: 466,
+ &#39;quite&#39;: 99,
+ &#39;effective&#39;: 14,
+ &#39;western&#39;: 28,
+ &#39;once&#39;: 78,
+ &#39;should&#39;: 160,
+ &#39;nothing&#39;: 133,
+ &#39;said&#39;: 70,
+ &#39;hardly&#39;: 19,
+ &#39;profound&#39;: 6,
+ &#39;saying&#39;: 21,
+ &#39;eat&#39;: 5,
+ &#39;good&#39;: 456,
+ &#39;breakfast&#39;: 6,
+ &#39;every&#39;: 158,
+ &#39;morning&#39;: 5,
+ &#39;your&#39;: 175,
+ &#39;health&#39;: 6,
+ &#39;statement&#39;: 7,
+ &#39;fact&#39;: 116,
+ &#39;turning&#39;: 9,
+ &#39;minor&#39;: 10,
+ &#39;ridiculous&#39;: 27,
+ &#39;typical&#39;: 25,
+ &#39;scripts&#39;: 7,
+ &#39;really&#39;: 321,
+ &#39;bad&#39;: 264,
+ &#39;errors&#39;: 5,
+ &#39;common&#39;: 20,
+ &#39;sense&#39;: 66,
+ &#39;them&#39;: 230,
+ &#39;mistake&#39;: 13,
+ &#39;adventure&#39;: 18,
+ &#39;full&#39;: 44,
+ &#39;creator&#39;: 6,
+ &#39;worth&#39;: 73,
+ &#39;political&#39;: 26,
+ &#39;ideas&#39;: 18,
+ &#39;study&#39;: 7,
+ &#39;human&#39;: 53,
+ &#39;nature&#39;: 24,
+ &#39;context&#39;: 13,
+ &#39;without&#39;: 87,
+ &#39;simply&#39;: 48,
+ &#39;everyone&#39;: 51,
+ &#39;finished&#39;: 12,
+ &#39;product&#39;: 6,
+ &#39;performers&#39;: 9,
+ &#39;worst&#39;: 86,
+ &#39;sequel&#39;: 19,
+ &#39;movies&#39;: 265,
+ &#39;again&#39;: 138,
+ &#39;doesn&#39;: 122,
+ &#39;killer&#39;: 81,
+ &#39;still&#39;: 149,
+ &#39;kills&#39;: 28,
+ &#39;fun&#39;: 57,
+ &#39;killing&#39;: 26,
+ &#39;making&#39;: 77,
+ &#39;happened&#39;: 28,
+ &#39;means&#39;: 22,
+ &#39;ever&#39;: 202,
+ &#39;don&#39;: 262,
+ &#39;value&#39;: 16,
+ &#39;hour&#39;: 33,
+ &#39;during&#39;: 67,
+ &#39;ll&#39;: 86,
+ &#39;want&#39;: 104,
+ &#39;ask&#39;: 17,
+ &#39;him&#39;: 257,
+ &#39;original&#39;: 94,
+ &#39;makes&#39;: 131,
+ &#39;action&#39;: 83,
+ &#39;let&#39;: 54,
+ &#39;child&#39;: 62,
+ &#39;adult&#39;: 15,
+ &#39;impact&#39;: 6,
+ &#39;insult&#39;: 5,
+ &#39;tmnt&#39;: 7,
+ &#39;venus&#39;: 5,
+ &#39;does&#39;: 151,
+ &#39;never&#39;: 189,
+ &#39;took&#39;: 37,
+ &#39;away&#39;: 94,
+ &#39;tragic&#39;: 10,
+ &#39;tale&#39;: 29,
+ &#39;4&#39;: 47,
+ &#39;male&#39;: 23,
+ &#39;family&#39;: 91,
+ &#39;gone&#39;: 21,
+ &#39;over&#39;: 212,
+ &#39;power&#39;: 32,
+ &#39;horrible&#39;: 34,
+ &#39;episode&#39;: 34,
+ &#39;voices&#39;: 7,
+ &#39;wrong&#39;: 47,
+ &#39;acted&#39;: 21,
+ &#39;done&#39;: 100,
+ &#39;job&#39;: 95,
+ &#39;bother&#39;: 10,
+ &#39;worthy&#39;: 9,
+ &#39;material&#39;: 23,
+ &#39;slow&#39;: 34,
+ &#39;looking&#39;: 79,
+ &#39;totally&#39;: 40,
+ &#39;shredder&#39;: 6,
+ &#39;dude&#39;: 5,
+ &#39;corny&#39;: 7,
+ &#39;turtles&#39;: 6,
+ &#39;looked&#39;: 35,
+ &#39;things&#39;: 95,
+ &#39;hanging&#39;: 9,
+ &#39;off&#39;: 170,
+ &#39;bodies&#39;: 8,
+ &#39;around&#39;: 83,
+ &#39;silly&#39;: 24,
+ &#39;got&#39;: 117,
+ &#39;rid&#39;: 6,
+ &#39;stupid&#39;: 59,
+ &#39;cartoon&#39;: 8,
+ &#39;sounds&#39;: 12,
+ &#39;writing&#39;: 36,
+ &#39;those&#39;: 120,
+ &#39;kelly&#39;: 47,
+ &#39;legend&#39;: 42,
+ &#39;hoping&#39;: 12,
+ &#39;accurate&#39;: 15,
+ &#39;creative&#39;: 10,
+ &#39;license&#39;: 6,
+ &#39;taken&#39;: 44,
+ &#39;naomi&#39;: 7,
+ &#39;existed&#39;: 6,
+ &#39;reality&#39;: 38,
+ &#39;purely&#39;: 11,
+ &#39;piece&#39;: 40,
+ &#39;entertainment&#39;: 31,
+ &#39;holds&#39;: 5,
+ &#39;title&#39;: 45,
+ &#39;solid&#39;: 20,
+ &#39;ned&#39;: 57,
+ &#39;hard&#39;: 85,
+ &#39;considering&#39;: 19,
+ &#39;previous&#39;: 15,
+ &#39;mick&#39;: 5,
+ &#39;jagger&#39;: 5,
+ &#39;australian&#39;: 22,
+ &#39;rules&#39;: 5,
+ &#39;bob&#39;: 11,
+ &#39;poor&#39;: 40,
+ &#39;location&#39;: 11,
+ &#39;shooting&#39;: 43,
+ &#39;area&#39;: 12,
+ &#39;live&#39;: 37,
+ &#39;outside&#39;: 14,
+ &#39;remember&#39;: 41,
+ &#39;golden&#39;: 14,
+ &#39;released&#39;: 35,
+ &#39;critics&#39;: 10,
+ &#39;m&#39;: 147,
+ &#39;badly&#39;: 23,
+ &#39;less&#39;: 63,
+ &#39;ended&#39;: 11,
+ &#39;eddie&#39;: 10,
+ &#39;murphy&#39;: 13,
+ &#39;guess&#39;: 38,
+ &#39;going&#39;: 124,
+ &#39;gets&#39;: 97,
+ &#39;front&#39;: 20,
+ &#39;blank&#39;: 19,
+ &#39;expression&#39;: 10,
+ &#39;guys&#39;: 35,
+ &#39;enter&#39;: 9,
+ &#39;sits&#39;: 6,
+ &#39;pull&#39;: 6,
+ &#39;giant&#39;: 8,
+ &#39;cage&#39;: 12,
+ &#39;stick&#39;: 14,
+ &#39;inside&#39;: 21,
+ &#39;impression&#39;: 19,
+ &#39;michael&#39;: 29,
+ &#39;give&#39;: 109,
+ &#39;wooden&#39;: 8,
+ &#39;sequence&#39;: 20,
+ &#39;pop&#39;: 9,
+ &#39;soundtrack&#39;: 29,
+ &#39;obviously&#39;: 29,
+ &#39;might&#39;: 103,
+ &#39;cool&#39;: 27,
+ &#39;seems&#39;: 126,
+ &#39;completely&#39;: 52,
+ &#39;somewhat&#39;: 26,
+ &#39;bloody&#39;: 7,
+ &#39;opening&#39;: 31,
+ &#39;problem&#39;: 49,
+ &#39;boy&#39;: 37,
+ &#39;whole&#39;: 96,
+ &#39;mood&#39;: 7,
+ &#39;change&#39;: 24,
+ &#39;different&#39;: 52,
+ &#39;blame&#39;: 9,
+ &#39;personally&#39;: 11,
+ &#39;pointed&#39;: 6,
+ &#39;producer&#39;: 15,
+ &#39;share&#39;: 11,
+ &#39;equal&#39;: 8,
+ &#39;did&#39;: 158,
+ &#39;anyone&#39;: 91,
+ &#39;before&#39;: 126,
+ &#39;fantasy&#39;: 33,
+ &#39;martial&#39;: 11,
+ &#39;arts&#39;: 10,
+ &#39;comedy&#39;: 100,
+ &#39;crap&#39;: 22,
+ &#39;seeing&#39;: 57,
+ &#39;used&#39;: 53,
+ &#39;attend&#39;: 6,
+ &#39;e&#39;: 16,
+ &#39;almost&#39;: 94,
+ &#39;forgotten&#39;: 17,
+ &#39;me&#39;: 319,
+ &#39;my&#39;: 339,
+ &#39;wish&#39;: 30,
+ &#39;tried&#39;: 21,
+ &#39;recently&#39;: 18,
+ &#39;discovered&#39;: 11,
+ &#39;mind&#39;: 63,
+ &#39;beyond&#39;: 28,
+ &#39;understanding&#39;: 9,
+ &#39;cat&#39;: 9,
+ &#39;extremely&#39;: 34,
+ &#39;truly&#39;: 59,
+ &#39;message&#39;: 19,
+ &#39;form&#39;: 23,
+ &#39;content&#39;: 9,
+ &#39;missed&#39;: 16,
+ &#39;fan&#39;: 60,
+ &#39;wave&#39;: 9,
+ &#39;underground&#39;: 5,
+ &#39;barely&#39;: 18,
+ &#39;closing&#39;: 5,
+ &#39;credits&#39;: 21,
+ &#39;dropped&#39;: 5,
+ &#39;art&#39;: 45,
+ &#39;youth&#39;: 6,
+ &#39;documentary&#39;: 26,
+ &#39;playing&#39;: 58,
+ &#39;its&#39;: 253,
+ &#39;relationship&#39;: 31,
+ &#39;real&#39;: 159,
+ &#39;ways&#39;: 30,
+ &#39;sight&#39;: 12,
+ &#39;al&#39;: 37,
+ &#39;cliver&#39;: 8,
+ &#39;naked&#39;: 14,
+ &#39;black&#39;: 92,
+ &#39;nelson&#39;: 5,
+ &#39;laura&#39;: 19,
+ &#39;crawford&#39;: 11,
+ &#39;ursula&#39;: 5,
+ &#39;buchfellner&#39;: 8,
+ &#39;kidnapped&#39;: 9,
+ &#39;group&#39;: 24,
+ &#39;ransom&#39;: 9,
+ &#39;6&#39;: 29,
+ &#39;million&#39;: 15,
+ &#39;delivered&#39;: 8,
+ &#39;island&#39;: 21,
+ &#39;count&#39;: 15,
+ &#39;vietnam&#39;: 5,
+ &#39;hired&#39;: 7,
+ &#39;save&#39;: 28,
+ &#39;local&#39;: 8,
+ &#39;tribe&#39;: 8,
+ &#39;offer&#39;: 10,
+ &#39;monster&#39;: 11,
+ &#39;cannibal&#39;: 29,
+ &#39;god&#39;: 30,
+ &#39;eyes&#39;: 51,
+ &#39;filming&#39;: 17,
+ &#39;set&#39;: 61,
+ &#39;cannibals&#39;: 8,
+ &#39;bit&#39;: 91,
+ &#39;comes&#39;: 82,
+ &#39;thanks&#39;: 12,
+ &#39;mostly&#39;: 34,
+ &#39;hilarious&#39;: 25,
+ &#39;track&#39;: 15,
+ &#39;goofy&#39;: 5,
+ &#39;franco&#39;: 17,
+ &#39;split&#39;: 6,
+ &#39;interview&#39;: 8,
+ &#39;strong&#39;: 34,
+ &#39;including&#39;: 29,
+ &#39;whose&#39;: 29,
+ &#39;most&#39;: 244,
+ &#39;head&#39;: 47,
+ &#39;seen&#39;: 206,
+ &#39;trying&#39;: 60,
+ &#39;tons&#39;: 5,
+ &#39;gore&#39;: 23,
+ &#39;paint&#39;: 8,
+ &#39;variety&#39;: 8,
+ &#39;slowly&#39;: 15,
+ &#39;de&#39;: 17,
+ &#39;waves&#39;: 16,
+ &#39;sadly&#39;: 15,
+ &#39;jess&#39;: 6,
+ &#39;40&#39;: 12,
+ &#39;minutes&#39;: 64,
+ &#39;run&#39;: 29,
+ &#39;80&#39;: 11,
+ &#39;looks&#39;: 58,
+ &#39;nice&#39;: 57,
+ &#39;odd&#39;: 11,
+ &#39;images&#39;: 18,
+ &#39;darker&#39;: 6,
+ &#39;dialog&#39;: 20,
+ &#39;spanish&#39;: 14,
+ &#39;listen&#39;: 8,
+ &#39;gives&#39;: 51,
+ &#39;16&#39;: 6,
+ &#39;minute&#39;: 20,
+ &#39;star&#39;: 94,
+ &#39;spoilers&#39;: 26,
+ &#39;wouldn&#39;: 30,
+ &#39;hollow&#39;: 19,
+ &#39;man&#39;: 205,
+ &#39;commercial&#39;: 10,
+ &#39;paul&#39;: 24,
+ &#39;verhoeven&#39;: 25,
+ &#39;kevin&#39;: 18,
+ &#39;bacon&#39;: 32,
+ &#39;elisabeth&#39;: 5,
+ &#39;shue&#39;: 14,
+ &#39;plus&#39;: 23,
+ &#39;theme&#39;: 35,
+ &#39;invisibility&#39;: 8,
+ &#39;premise&#39;: 19,
+ &#39;unfortunately&#39;: 38,
+ &#39;week&#39;: 13,
+ &#39;suspense&#39;: 15,
+ &#39;predictable&#39;: 32,
+ &#39;bunch&#39;: 13,
+ &#39;scientists&#39;: 5,
+ &#39;animals&#39;: 8,
+ &#39;succeeded&#39;: 8,
+ &#39;decides&#39;: 18,
+ &#39;test&#39;: 8,
+ &#39;himself&#39;: 60,
+ &#39;invisible&#39;: 36,
+ &#39;changes&#39;: 12,
+ &#39;murder&#39;: 47,
+ &#39;thin&#39;: 13,
+ &#39;line&#39;: 68,
+ &#39;ill&#39;: 9,
+ &#39;suffers&#39;: 5,
+ &#39;many&#39;: 207,
+ &#39;special&#39;: 99,
+ &#39;effects&#39;: 97,
+ &#39;lead&#39;: 36,
+ &#39;producers&#39;: 17,
+ &#39;thriller&#39;: 23,
+ &#39;giving&#39;: 28,
+ &#39;damn&#39;: 8,
+ &#39;admit&#39;: 17,
+ &#39;fx&#39;: 6,
+ &#39;awesome&#39;: 13,
+ &#39;matrix&#39;: 7,
+ &#39;enough&#39;: 97,
+ &#39;directors&#39;: 17,
+ &#39;care&#39;: 39,
+ &#39;spectacular&#39;: 7,
+ &#39;few&#39;: 95,
+ &#39;perfectly&#39;: 14,
+ &#39;fabulous&#39;: 11,
+ &#39;plot&#39;: 212,
+ &#39;starship&#39;: 5,
+ &#39;troopers&#39;: 6,
+ &#39;p&#39;: 9,
+ &#39;reasons&#39;: 25,
+ &#39;why&#39;: 122,
+ &#39;joke&#39;: 19,
+ &#39;woman&#39;: 103,
+ &#39;won&#39;: 47,
+ &#39;spoil&#39;: 7,
+ &#39;moment&#39;: 30,
+ &#39;okay&#39;: 15,
+ &#39;went&#39;: 37,
+ &#39;beginning&#39;: 41,
+ &#39;die&#39;: 20,
+ &#39;course&#39;: 77,
+ &#39;dying&#39;: 5,
+ &#39;low&#39;: 52,
+ &#39;rule&#39;: 5,
+ &#39;somebody&#39;: 12,
+ &#39;alone&#39;: 36,
+ &#39;lab&#39;: 13,
+ &#39;perfect&#39;: 40,
+ &#39;victim&#39;: 15,
+ &#39;example&#39;: 42,
+ &#39;ending&#39;: 58,
+ &#39;absolutely&#39;: 51,
+ &#39;hits&#39;: 10,
+ &#39;falls&#39;: 27,
+ &#39;ground&#39;: 10,
+ &#39;leave&#39;: 22,
+ &#39;quietly&#39;: 5,
+ &#39;attacks&#39;: 5,
+ &#39;kill&#39;: 33,
+ &#39;screams&#39;: 6,
+ &#39;heard&#39;: 38,
+ &#39;explosion&#39;: 5,
+ &#39;ago&#39;: 36,
+ &#39;suddenly&#39;: 30,
+ &#39;hear&#39;: 13,
+ &#39;above&#39;: 23,
+ &#39;mr&#39;: 26,
+ &#39;supposed&#39;: 43,
+ &#39;10&#39;: 126,
+ &#39;awful&#39;: 50,
+ &#39;theory&#39;: 16,
+ &#39;directed&#39;: 23,
+ &#39;chick&#39;: 15,
+ &#39;o&#39;: 13,
+ &#39;r&#39;: 11,
+ &#39;g&#39;: 8,
+ &#39;thousand&#39;: 6,
+ &#39;picture&#39;: 67,
+ &#39;sound&#39;: 48,
+ &#39;rated&#39;: 16,
+ &#39;c&#39;: 15,
+ &#39;aren&#39;: 33,
+ &#39;negative&#39;: 9,
+ &#39;scores&#39;: 7,
+ &#39;imdb&#39;: 24,
+ &#39;com&#39;: 8,
+ &#39;rating&#39;: 22,
+ &#39;system&#39;: 12,
+ &#39;ps&#39;: 7,
+ &#39;called&#39;: 47,
+ &#39;etc&#39;: 29,
+ &#39;another&#39;: 137,
+ &#39;warning&#39;: 17,
+ &#39;following&#39;: 19,
+ &#39;superb&#39;: 22,
+ &#39;base&#39;: 6,
+ &#39;events&#39;: 20,
+ &#39;filmed&#39;: 27,
+ &#39;presumably&#39;: 5,
+ &#39;largely&#39;: 11,
+ &#39;canadian&#39;: 13,
+ &#39;crew&#39;: 21,
+ &#39;caught&#39;: 19,
+ &#39;half&#39;: 47,
+ &#39;thoroughly&#39;: 12,
+ &#39;blatant&#39;: 5,
+ &#39;historical&#39;: 37,
+ &#39;propaganda&#39;: 6,
+ &#39;susan&#39;: 6,
+ &#39;sarandon&#39;: 7,
+ &#39;assume&#39;: 6,
+ &#39;born&#39;: 8,
+ &#39;heroes&#39;: 11,
+ &#39;small&#39;: 44,
+ &#39;private&#39;: 9,
+ &#39;based&#39;: 37,
+ &#39;air&#39;: 13,
+ &#39;dislike&#39;: 6,
+ &#39;neil&#39;: 16,
+ &#39;simon&#39;: 22,
+ &#39;among&#39;: 28,
+ &#39;entertaining&#39;: 33,
+ &#39;comedies&#39;: 23,
+ &#39;watched&#39;: 60,
+ &#39;connection&#39;: 7,
+ &#39;meet&#39;: 26,
+ &#39;ah&#39;: 6,
+ &#39;afraid&#39;: 14,
+ &#39;changed&#39;: 20,
+ &#39;men&#39;: 52,
+ &#39;dull&#39;: 19,
+ &#39;stars&#39;: 54,
+ &#39;review&#39;: 17,
+ &#39;living&#39;: 41,
+ &#39;grandmother&#39;: 5,
+ &#39;walter&#39;: 32,
+ &#39;matthau&#39;: 63,
+ &#39;magnificent&#39;: 12,
+ &#39;secondly&#39;: 9,
+ &#39;burns&#39;: 62,
+ &#39;somehow&#39;: 18,
+ &#39;late&#39;: 42,
+ &#39;enjoyed&#39;: 41,
+ &#39;although&#39;: 73,
+ &#39;recognize&#39;: 9,
+ &#39;remarkable&#39;: 9,
+ &#39;top&#39;: 61,
+ &#39;laugh&#39;: 37,
+ &#39;turn&#39;: 39,
+ &#39;pleasure&#39;: 13,
+ &#39;roughly&#39;: 5,
+ &#39;knew&#39;: 31,
+ &#39;nazi&#39;: 14,
+ &#39;everybody&#39;: 24,
+ &#39;speaking&#39;: 12,
+ &#39;danish&#39;: 16,
+ &#39;decided&#39;: 21,
+ &#39;check&#39;: 40,
+ ...}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Removing the words that occur less than five times&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def occurence_less_than_five(data,occurence):
+    for i,v in enumerate(data):
+        new_vocab=[]
+        for line in v.split():
+            if line in occurence.keys():
+                new_vocab.append(line)
+        new_vocab=&#39; &#39;.join(new_vocab)
+        data[i]=new_vocab
+    return data
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;X_train=occurence_less_than_five(X_train,word_vocab)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#X_train[0]
+after_remove_word_vocab=build_freq_and_vocab(X_train)
+print(&amp;quot;Length of word vocab after removing occurence less than 5\n&amp;quot;len(after_remove_word_vocab))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Length of word vocab after removing occurence less than 5
+26300
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def Word_Prob(word):
+    word_rev = 0
+    total_rev = 0
+    for class_label in word:
+        total_rev= total_rev+len(word_vocab[word])           
+        for rev in class_label[word]:
+            if word in rev:
+                word_rev=+1
+    prob = word_rev/total_rev 
+    return prob
+#to calculate number of documents that has a particular word
+def word_in_doc(X,word_vocab):
+    vocab_list={}
+    for word in word_vocab.keys():
+        count=0
+        for line in X:
+            if word in line:
+                count+=1
+        vocab_list[word]=count
+    return vocab_list
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;word_in_document=word_in_doc(X_train,word_vocab)
+#len(word_in_document)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#P[the]=# of doc containing the/total no . of doc
+def denom_prob_count(datab,word):
+    if word not in word_in_document.keys():
+        count=0
+    else:
+        count=word_in_document[word]
+    return count/len(X_train)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Probability(the)=no.of docs containing &#39;the&#39;/total documents&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;denom=denom_prob_count(X_train,&#39;the&#39;)
+print(&amp;quot;P[the]=No.of documents containing &#39;the&#39;/ Total number of documents&amp;quot;)
+print(denom)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;P[the]=No.of documents containing &#39;the&#39;/ Total number of documents
+0.9962546816479401
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+def word_in_doc_count(X,Y,occurence,sent):
+    word_pos_count={}
+    word_neg_count={}
+    
+    if sent==&#39;positive&#39;:
+        for word in occurence.keys():
+            cn=0
+            for i,rev in enumerate(X):
+                if word in rev.split() and Y[i]==1:
+                    cn+=1
+            word_pos_count[word]=cn
+        return word_pos_count
+
+    if sent==&#39;negative&#39;:
+        for word in occurence.keys():
+            cn=0
+            for i,rev in enumerate(X):
+                if word in rev.split() and Y[i]==0:
+                    cn+=1
+            word_neg_count[word]=cn
+        return word_neg_count
+
+    
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;wordneg=word_in_doc_count(X_train,Y_train,word_vocab,sent=&amp;quot;negative&amp;quot;)
+wordpos=word_in_doc_count(X_train,Y_train,word_vocab,sent=&amp;quot;positive&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#total length of positive and negative documents
+
+def prob_document_length(Y_train):
+    len_pos=0
+    len_neg=0
+    for i in range(len(Y_train)):
+        if(Y_train[i]==1):
+            len_pos+=1
+        else:
+            len_neg+=1
+    return(len_pos),(len_neg)
+
+len_pos,len_neg=prob_document_length(Y_train)
+#print(len(Y_train))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Finding P(the|pos) or probability or word given a sentiment&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#number of the word in positive or negative document
+def numerat(word,sent):
+    if sent==&#39;positive&#39;:
+        if word not in wordpos.keys():
+            count=0
+        else:
+            count=wordpos[word]
+            
+    elif sent==&#39;negative&#39;:
+        if word not in wordneg.keys():
+            count=0
+        else:
+            count=wordneg[word]
+
+    return count
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;##eg: P(the|positive)
+
+numerator=numerat(&#39;the&#39;,sent=&#39;positive&#39;)
+prob=numerator/len_pos
+print(prob)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.9925
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Building the naive bayes model&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def NB(X_train,Y_train,word,flag_smooth,sent):
+    #naiv_prob=0
+    if sent==&#39;positive&#39;:
+        
+        num1=(numerat(word,sent))/len_pos
+        num2=len_pos/len(Y_train)
+        a=(num1*num2)
+        den=denom_prob_count(X_train,word)
+        den_actual=den if den!=0 else 0.001
+        if flag_smooth==True:
+            a_new=a+1
+            
+            d_new=den_actual
+            naiv_prob=a_new/float(d_new)   
+        else:
+            naiv_prob=a/float(den_actual) 
+    
+    elif sent==&#39;negative&#39;:
+        num1=(numerat(word,sent))/len_neg
+        num2=len_neg/len(Y_train)
+        a=(num1*num2)
+        den=denom_prob_count(X_train,word) 
+        den_actual=den if den!=0 else 0.001
+        if flag_smooth==True:
+            a_new=a+1
+            d_new=den_actual+2
+            naiv_prob=a_new/float(d_new)
+        else:
+            naiv_prob=a/float(den_actual)
+    #print(naiv_prob)        
+    return naiv_prob
+    
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#example of naive bayes
+
+r=NB(X_train,Y_train,&#39;the&#39;,True,sent=&#39;positive&#39;)
+print(r)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.49916666666666665
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def NB_all(X_train,Y_train,test,flag_smooth):
+    sum1=1
+    sum2=1
+    y_pred=[]
+    for i,v in enumerate(test):
+        for word in v.split():
+            sum1=(sum1*NB(X_train,Y_train,word,flag_smooth,sent=&amp;quot;positive&amp;quot;))
+            sum2=(sum2*NB(X_train,Y_train,word,flag_smooth,sent=&amp;quot;negative&amp;quot;,))
+        if(sum1&amp;lt;sum2):
+            y_pred.append(0)
+            #print(&amp;quot;negative&amp;quot;)
+        else:
+            y_pred.append(1)
+            #print(&amp;quot;positive&amp;quot;)
+        #print(&amp;quot;sum&amp;quot;,sum1,sum2)
+    return(y_pred)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def accuracy_score(actual,predicted):
+    count=0
+    for i in range(len(actual)):
+        if(actual[i]==predicted[i]):
+            count+=1
+
+    return count/float(len(actual))
+        
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:16px;text-align:center;&gt;Calculating the accuracy of the development dataset&lt;/p&gt;
+&lt;p style=&#34;font-family:Georgia;font-size:15.3px;text-align:center;&#34;&gt;As we can see we can make improvements if we tune our hyperparameters&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#print(pred)
+pred=NB_all(X_train,Y_train,X_dev,flag_smooth=False)
+score=accuracy_score(Y_dev,pred)
+print(&amp;quot;Accuracy of the development data set without smoothing &amp;quot;,(score*100))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Accuracy of the development data set without smoothing  50.24875621890548
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;len_pos,len_neg=prob_document_length(Y_train)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Deriving the top ten positive words&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import operator
+pos={}
+neg={}
+#root=[]
+for word in word_vocab.keys():
+    top_pos=NB(X_train,Y_train,word,False,sent=&#39;positive&#39;)
+    top_neg=NB(X_train,Y_train,word,False,sent=&#39;negative&#39;)
+    pos[word]=top_pos
+    neg[word]=top_neg
+#Reference:https://stackoverflow.com/questions/7197315/5-maximum-values-in-a-python-dictionary
+top_pos_10=dict(sorted(pos.items(),key=operator.itemgetter(1), reverse=True)[:10])
+top_neg_10=dict(sorted(neg.items(),key=operator.itemgetter(1), reverse=False)[:10])
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print(&amp;quot;top 10 positive words::&amp;quot;)
+for word in top_pos_10.keys():
+    print(word)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;top 10 positive words::
+custer
+tsui
+depicted
+georgia
+patricia
+plots
+willy
+alicia
+resort
+religion
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print(&amp;quot;top 10 negative words::&amp;quot;)
+for word in top_neg_10.keys():
+    print(word)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;top 10 negative words::
+goldberg
+retired
+finest
+demille
+ii
+custer
+lincoln
+busy
+immediate
+attend
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Comparing the effects of smoothing&lt;/p&gt;
+&lt;p style=&#34;font-family:Georgia;font-size:15.3px;&#34;&gt;Considering the optimal hyperparameter , smoothing increases the accuracy of our model&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;pred=NB_all(X_train,Y_train,X_test,flag_smooth=False)
+score=accuracy_score(Y_test,pred)
+#pred=NB_all(X_train,Y_train,X_train,flag_smooth=True)
+#score=accuracy_score(Y_train,pred)
+print(score*100)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;57.496
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;&gt;Using the test dataset&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;pred=NB_all(X_train,Y_train,X_test,flag_smooth=True)
+score=accuracy_score(Y_train,pred)
+#pred=NB_all(X_train,Y_train,X_test,flag_smooth=False)
+#score=accuracy_score(Y_test,pred)
+print(&amp;quot;Probabiity of the dataset after optimal hyperparameters and smoothing \n&amp;quot;,score*100)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Probabiity of the test dataset after optimal hyperparameters and smoothing
+64.763
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p style=font-weight:bold;&gt;We have seen that Naive Bayes can be used extensively for text categorization and solving the problem or whether a document belongs to one sentiment or another.Some problems faced during the implemetation of this assignment were targeting a large dataset.&lt;br /&gt;We can see that the smoothing increases the accuracy slightly and we can compile a better probabilistic model if smoothing(eg.Laplace) is done.To further improve accuracy we can use some tactics like vectorisation or lemmatizing our words.Naive Bayes as a whole certainly aids to classify a text dataset in those aspects&lt;/p&gt;
+&lt;p&gt;References:
+&lt;a href=&#34;https://towardsdatascience.com/unfolding-na%C3%AFve-bayes-from-scratch-2e86dcae4b01#08ef&#34;&gt;https://towardsdatascience.com/unfolding-na%C3%AFve-bayes-from-scratch-2e86dcae4b01#08ef&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://machinelearningmastery.com/naive-bayes-classifier-scratch-python/&#34;&gt;https://machinelearningmastery.com/naive-bayes-classifier-scratch-python/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://machinelearningmastery.com/load-machine-learning-data-scratch-python/&#34;&gt;https://machinelearningmastery.com/load-machine-learning-data-scratch-python/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://machinelearningmastery.com/implement-resampling-methods-scratch-python/&#34;&gt;https://machinelearningmastery.com/implement-resampling-methods-scratch-python/&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
     
     <item>
       <title>NLP</title>

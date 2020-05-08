@@ -28,7 +28,9 @@
   
     
   
-  <meta name="description" content=" ">
+  <meta name="description" content="IMPLEMENTING NAIVE BAYES FROM SCRATCH USING MOVIE REVIEW DATASET
+Naive Bayes is one of the most common ML algorithms that is often used for the purpose of text classification. If you have just stepped into ML, it is one of the easiest classification algorithms to start with. Naive Bayes is a probabilistic classification algorithm as it uses probability to make predictions for the purpose of classification.
+Importing the necessary libraries">
 
   
   <link rel="alternate" hreflang="en-us" href="https://sushantmhambrey.github.io/post/assn3/">
@@ -228,14 +230,16 @@
   
   <meta property="og:site_name" content="Sushant Mhambrey">
   <meta property="og:url" content="https://sushantmhambrey.github.io/post/assn3/">
-  <meta property="og:title" content="Assignment3 | Sushant Mhambrey">
-  <meta property="og:description" content=" "><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="og:title" content="Naive Bayes from Scratch | Sushant Mhambrey">
+  <meta property="og:description" content="IMPLEMENTING NAIVE BAYES FROM SCRATCH USING MOVIE REVIEW DATASET
+Naive Bayes is one of the most common ML algorithms that is often used for the purpose of text classification. If you have just stepped into ML, it is one of the easiest classification algorithms to start with. Naive Bayes is a probabilistic classification algorithm as it uses probability to make predictions for the purpose of classification.
+Importing the necessary libraries"><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
   <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="en-us">
   
     
-      <meta property="article:published_time" content="2020-05-08T05:15:48-05:00">
+      <meta property="article:published_time" content="2020-04-21T00:00:00&#43;00:00">
     
-    <meta property="article:modified_time" content="2020-05-08T05:15:48-05:00">
+    <meta property="article:modified_time" content="2020-04-21T00:00:00&#43;00:00">
   
 
   
@@ -263,10 +267,10 @@
     "@type": "WebPage",
     "@id": "https://sushantmhambrey.github.io/post/assn3/"
   },
-  "headline": "Assignment3",
+  "headline": "Naive Bayes from Scratch",
   
-  "datePublished": "2020-05-08T05:15:48-05:00",
-  "dateModified": "2020-05-08T05:15:48-05:00",
+  "datePublished": "2020-04-21T00:00:00Z",
+  "dateModified": "2020-04-21T00:00:00Z",
   
   "author": {
     "@type": "Person",
@@ -281,7 +285,7 @@
       "url": "img/https://sushantmhambrey.github.io/"
     }
   },
-  "description": " "
+  "description": "IMPLEMENTING NAIVE BAYES FROM SCRATCH USING MOVIE REVIEW DATASET\nNaive Bayes is one of the most common ML algorithms that is often used for the purpose of text classification. If you have just stepped into ML, it is one of the easiest classification algorithms to start with. Naive Bayes is a probabilistic classification algorithm as it uses probability to make predictions for the purpose of classification.\nImporting the necessary libraries"
 }
 </script>
 
@@ -299,7 +303,7 @@
 
 
 
-  <title>Assignment3 | Sushant Mhambrey</title>
+  <title>Naive Bayes from Scratch | Sushant Mhambrey</title>
 
 </head>
 
@@ -581,7 +585,7 @@
   
   
 <div class="article-container pt-3">
-  <h1>Assignment3</h1>
+  <h1>Naive Bayes from Scratch</h1>
 
   
 
@@ -600,7 +604,7 @@
     
       
     
-    May 2020
+    Apr 2020
   </span>
   
 
@@ -609,7 +613,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    0 min read
+    16 min read
   </span>
   
 
@@ -645,7 +649,1511 @@
   <div class="article-container">
 
     <div class="article-style">
-       <iframe src="/Mhambrey_03.html" width="100%"height="150" style="border:none;" name="iframe"></iframe>
+      <p style=background-color:#ff7814;font-weight:bold;font-size:16px;text-align:center;> IMPLEMENTING NAIVE BAYES FROM SCRATCH USING MOVIE REVIEW DATASET</p>
+<p style="font-family:Georgia;font-size:18px;background-color:#2455d1;color:white;">Naive Bayes is one of the most common ML algorithms that is often used for the purpose of text classification. If you have just stepped into ML, it is one of the easiest classification algorithms to start with. Naive Bayes is a probabilistic classification algorithm as it uses probability to make predictions for the purpose of classification.</p>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Importing the necessary libraries</p>
+<pre><code class="language-python">import numpy as np
+import pandas as pd
+import os
+import string
+</code></pre>
+<pre><code class="language-python">from sys import path 
+from os import listdir
+from os.path import join
+import re
+def Load_Text_Files(dir_path):
+    #dir_path=path[0]
+    dir_path=review_dir_path
+    for file in listdir(dir_path):
+        if '.txt' in file:
+            paths = [join(dir_path,data)]
+    docs = []
+    for path in paths:
+        with open(path, 'r') as file: docs.append(file.read())
+    return docs
+
+def Clean(review):
+    p=re.sub(re.compile('&lt;.*?&gt;'),'',review)
+    rev=re.sub('[^0-9a-zA-Z]+', ' ', review.lower())
+    return rev
+</code></pre>
+<pre><code class="language-python">import glob
+data_train=[]
+for file in glob.glob(os.path.join('train/neg/','*.txt')):
+    f = open(file,'r',encoding=&quot;utf8&quot;)
+    review = f.read()
+    data_train.append([review,0])
+    
+for file in glob.glob(os.path.join('train/pos/','*.txt')):
+    f = open(file,'r',encoding=&quot;utf8&quot;)
+    review = f.read()
+    data_train.append([review,1])
+
+data_train = pd.DataFrame(data_train)
+</code></pre>
+<pre><code class="language-python">data_train.head()
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Story of a man who has unnatural feelings for ...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>OK its not the best film I've ever seen but at...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Amateur, no budget films can be surprisingly g...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>My girlfriend once brought around The Zombie C...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Without wishing to be a killjoy, Brad Sykes is...</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<pre><code class="language-python">data_test=[]
+for file in glob.glob(os.path.join('test/neg/','*.txt')):
+    f = open(file,'r',encoding=&quot;utf8&quot;)
+    review = f.read()
+    data_test.append([review,0])
+    
+for file in glob.glob(os.path.join('test/pos/','*.txt')):
+    f = open(file,'r',encoding=&quot;utf8&quot;)
+    review = f.read()
+    data_test.append([review,1])
+#appended values 0 and 1 represents negative and positive reviews about movies, respectively
+
+data_test = pd.DataFrame(data_test)
+</code></pre>
+<pre><code class="language-python">data_test.head()
+</code></pre>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p></style></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Once again Mr. Costner has dragged out a movie...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>I was looking forward to this movie. Trustwort...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>I gave this a 3 out of a possible 10 stars.&lt;br...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>I of course saw the previews for this at the b...</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>too bad this movie isn't. While "Nemesis Game"...</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>
+Converting the data frames to arrays for training and testing data </p>
+<pre><code class="language-python">X_train=data_train.iloc[:,0].values
+Y_train=data_train.iloc[:,1].values
+</code></pre>
+<pre><code class="language-python">X_test=data_test.iloc[:,0].values
+Y_test=data_test.iloc[:,1].values
+</code></pre>
+<pre><code class="language-python">#print(X_train[3])
+#print(X_test[30])
+</code></pre>
+<p <p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;> Cleaning the X_train and X_test </p>
+<pre><code class="language-python">for i in range(len(X_train)):
+    X_train[i]=Clean(X_train[i])
+print(X_train[3])
+</code></pre>
+<pre><code>my girlfriend once brought around the zombie chronicles for us to watch as a joke little did we realize the joke was on her for paying 1 for it while watching this film i started to come up with things i would rather be doing than watching the zombie chronicles these included br br 1 drinking bleach 2 rubbing sand in my eyes 3 writing a letter to brad sykes and garrett clancy 4 re enacting the american civil war 5 tax returns 6 gcse maths 7 sex with an old lady br br garrett clancy aka sgt ben draper wrote this the guy couldn t even dig a hole properly the best ting he did was kick a door down the best part of the film this was the worst film i have ever seen and i ve seen white noise the light never has a film had so many mistakes in it my girlfriend left it here so now i live with the shame of owning this piece of crap br br news just in owen wilson watched this film and tried to kill himself fact br br do not watch
+</code></pre>
+<pre><code class="language-python">for i in range(len(X_test)):
+    X_test[i]=Clean(X_test[i])
+#printX_test[30]
+</code></pre>
+<p <p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Diving the training data into training and development data </p>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+X_train,X_dev,Y_train,Y_dev=train_test_split(X_train,Y_train,test_size=0.2)
+#x_train[10]
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Making the vocabulary for the data</p>
+<pre><code class="language-python">def build_freq_and_vocab(X):
+    #vocab=set()
+    vocab={}
+    for val in X:
+        revs=val.split()
+        for word in revs:
+            if word not in vocab:
+                vocab[word]=1
+            else:
+                vocab[word]+=1
+    return(vocab)
+
+word_vocab=build_freq_and_vocab(X_train)
+#len(word_vocab)
+#word_vocab['idea']
+
+less_than_five=[]
+for i in word_vocab.keys():
+    #print(i)
+    if(word_vocab[i]&lt;5):
+         less_than_five.append(i)
+#print(len(less_than_fove))
+for i in less_than_five:
+    del word_vocab[i]
+#len(word_vocab)     
+#X_train[0]
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Dispaying the vocabulary of words</p>
+<pre><code class="language-python">word_vocab
+</code></pre>
+<pre><code>{'in': 2939,
+ 'today': 29,
+ 's': 1795,
+ 'world': 129,
+ 'of': 4371,
+ 'digital': 5,
+ 'there': 550,
+ 'is': 3175,
+ 'no': 370,
+ 'computer': 18,
+ 'than': 281,
+ 'can': 446,
+ 'the': 9911,
+ 'actor': 90,
+ 'and': 4979,
+ 'writer': 29,
+ 'alas': 9,
+ 'this': 2326,
+ 'type': 39,
+ 'character': 222,
+ 'driven': 7,
+ 'film': 1258,
+ 'far': 98,
+ 'too': 235,
+ 'rare': 11,
+ 'these': 183,
+ 'days': 45,
+ 'duvall': 9,
+ 'performance': 86,
+ 'as': 1337,
+ 'well': 282,
+ 'james': 31,
+ 'earl': 19,
+ 'jones': 25,
+ 'are': 919,
+ 'to': 3989,
+ 'their': 348,
+ 'audience': 74,
+ 'high': 68,
+ 'expectations': 7,
+ 'i': 2715,
+ 'wonder': 31,
+ 'if': 494,
+ 'movie': 1238,
+ 'was': 1457,
+ 'made': 256,
+ 'for': 1322,
+ 'tv': 68,
+ 'it': 2932,
+ 'has': 497,
+ 'a': 4792,
+ 'close': 37,
+ 'up': 364,
+ 'personal': 25,
+ 'quality': 42,
+ 'narrative': 17,
+ 'an': 681,
+ 'say': 163,
+ 'that': 2191,
+ 'performances': 49,
+ 'all': 737,
+ 'outstanding': 12,
+ 'only': 369,
+ 'thing': 142,
+ 'keeps': 15,
+ 'from': 623,
+ 'being': 210,
+ 'cinema': 59,
+ 'masterpiece': 27,
+ 'lack': 27,
+ 'great': 276,
+ 'but': 1254,
+ 'pretty': 88,
+ 'pictures': 14,
+ 'not': 885,
+ 'everything': 74,
+ 'how': 268,
+ 'talent': 27,
+ 'likes': 16,
+ 'continue': 11,
+ 'produce': 10,
+ 'such': 157,
+ 'fine': 49,
+ 'work': 148,
+ 'age': 38,
+ 'where': 146,
+ 'actors': 156,
+ 'excellent': 71,
+ 'with': 1268,
+ 'extraordinary': 5,
+ 'cast': 123,
+ 'acting': 204,
+ 'very': 431,
+ 'disappointed': 26,
+ 'academy': 16,
+ 'when': 458,
+ 'didn': 143,
+ 't': 1029,
+ 'get': 265,
+ 'oscar': 40,
+ 'best': 192,
+ 'actress': 64,
+ 'goldberg': 24,
+ 'certainly': 32,
+ 'deserved': 14,
+ 'any': 218,
+ 'case': 40,
+ 'take': 115,
+ 'look': 102,
+ 'at': 700,
+ 'am': 86,
+ 'sure': 78,
+ 'you': 1025,
+ 'will': 270,
+ 'enjoy': 45,
+ 'much': 292,
+ 'films': 237,
+ 'fill': 10,
+ 'subject': 30,
+ 'matter': 32,
+ 'so': 635,
+ 'after': 223,
+ 'watching': 147,
+ 'trailer': 7,
+ 'water': 11,
+ 'expected': 23,
+ 'like': 583,
+ 'because': 283,
+ 'thought': 104,
+ 'd': 88,
+ 'on': 1058,
+ 'something': 131,
+ 'unique': 22,
+ 'honestly': 16,
+ 'portrays': 11,
+ 'teen': 24,
+ 'lesbian': 13,
+ 'love': 273,
+ 'sort': 32,
+ 'female': 42,
+ 'version': 51,
+ 'beautiful': 77,
+ 'br': 3152,
+ 'main': 70,
+ 'characters': 200,
+ 'young': 114,
+ 'french': 24,
+ 'women': 95,
+ '15': 13,
+ 'years': 143,
+ 'old': 159,
+ 'marie': 17,
+ 'way': 240,
+ 'floriane': 7,
+ 'erotic': 8,
+ 'between': 111,
+ 'always': 85,
+ 'surface': 11,
+ 'then': 227,
+ 'just': 550,
+ 'below': 8,
+ 'however': 98,
+ 'about': 524,
+ 'upon': 32,
+ 'two': 243,
+ 'sexual': 28,
+ 'frustration': 5,
+ 'suffering': 13,
+ 'working': 34,
+ 'cross': 6,
+ 'purposes': 8,
+ 'least': 99,
+ 'sex': 63,
+ 'also': 274,
+ 'proves': 10,
+ 'makers': 17,
+ 'own': 92,
+ 'they': 677,
+ 'become': 53,
+ 'extra': 8,
+ 'features': 12,
+ 'lord': 6,
+ 'dvd': 71,
+ 'director': 153,
+ 'peter': 34,
+ 'says': 34,
+ 'cynicism': 5,
+ 'starts': 35,
+ 'meaning': 10,
+ 'regard': 5,
+ 'children': 41,
+ 'while': 138,
+ 'adults': 11,
+ 'part': 125,
+ 'maker': 6,
+ 'joy': 20,
+ 'asked': 11,
+ 'myself': 42,
+ 'yes': 43,
+ 'first': 274,
+ 'be': 850,
+ 'painful': 14,
+ 'fresh': 11,
+ 'life': 230,
+ 'positive': 18,
+ 'aspects': 8,
+ 'missing': 20,
+ 'balance': 7,
+ 'wants': 33,
+ 'poignant': 6,
+ 'celebration': 5,
+ 'impressed': 11,
+ 'her': 687,
+ 'ruins': 7,
+ 'what': 451,
+ 'point': 77,
+ 'showing': 17,
+ 'girl': 81,
+ 'nude': 9,
+ 'know': 179,
+ 'established': 5,
+ 'tasteful': 5,
+ 'nudity': 29,
+ 'european': 8,
+ 'by': 653,
+ 'devil': 16,
+ 'probably': 70,
+ 'little': 178,
+ 'heart': 41,
+ 'friends': 52,
+ 'europa': 57,
+ 'instance': 5,
+ 'see': 359,
+ 'make': 217,
+ 'show': 212,
+ 'unattractive': 5,
+ 'person': 52,
+ 'either': 58,
+ 'or': 487,
+ 'would': 388,
+ 've': 157,
+ 'been': 288,
+ 'honest': 16,
+ 'go': 118,
+ 'scene': 163,
+ 'club': 13,
+ 'dancing': 23,
+ 'follows': 14,
+ 'next': 51,
+ 'perhaps': 72,
+ 'biggest': 13,
+ 'honesty': 7,
+ 'takes': 63,
+ 'place': 72,
+ 'she': 524,
+ 'normal': 11,
+ 'asks': 13,
+ 'who': 654,
+ 'cares': 9,
+ 'plays': 73,
+ 'false': 9,
+ 'question': 17,
+ 'authentic': 10,
+ 'heartfelt': 5,
+ 'viewers': 35,
+ 'time': 371,
+ 'deserve': 16,
+ 'here': 160,
+ 'moments': 38,
+ 'which': 319,
+ 'viewer': 40,
+ '1': 55,
+ 'since': 76,
+ 'do': 251,
+ 'people': 285,
+ 'wearing': 6,
+ 'suits': 6,
+ 'turtle': 8,
+ 'boot': 5,
+ '2': 89,
+ 'down': 96,
+ 'core': 5,
+ 'thrown': 16,
+ 'garbage': 13,
+ 'order': 27,
+ 'taste': 9,
+ 'beloved': 5,
+ 'mouth': 13,
+ 'three': 80,
+ 'actresses': 32,
+ 'find': 129,
+ 'better': 159,
+ 'talents': 13,
+ 'may': 92,
+ 'terms': 18,
+ 'technique': 7,
+ 'could': 244,
+ 'have': 850,
+ 'successful': 17,
+ 'career': 30,
+ 'supporting': 30,
+ 'roles': 47,
+ 'leading': 20,
+ 'lady': 35,
+ 'both': 96,
+ 'intensity': 10,
+ 'future': 30,
+ 'play': 65,
+ 'emotionally': 7,
+ 'rise': 6,
+ 'disappointing': 16,
+ 'please': 49,
+ 'falling': 13,
+ 'necessarily': 11,
+ 'middle': 23,
+ 'aged': 9,
+ 'guy': 85,
+ 'girls': 68,
+ 'watch': 203,
+ 'identify': 9,
+ 'wonderful': 61,
+ 'new': 127,
+ 'crime': 27,
+ 'series': 101,
+ 'bringing': 7,
+ 'together': 75,
+ 'british': 17,
+ 'television': 30,
+ 'armstrong': 8,
+ 'retired': 9,
+ 'detectives': 9,
+ 'brought': 32,
+ 'back': 136,
+ 'help': 36,
+ 'clear': 23,
+ 'cases': 6,
+ 'under': 35,
+ 'younger': 16,
+ 'focused': 7,
+ 'amanda': 6,
+ 'quirky': 5,
+ 'cops': 11,
+ 'brilliant': 39,
+ 'team': 29,
+ 'twenty': 16,
+ 'year': 87,
+ 'police': 38,
+ 'force': 8,
+ 'moved': 20,
+ 'long': 105,
+ 'sometimes': 43,
+ 'effect': 39,
+ 'other': 284,
+ 'times': 92,
+ 'horror': 84,
+ 'portrayed': 21,
+ 'comic': 29,
+ 'scenes': 142,
+ 'some': 483,
+ 'moving': 31,
+ 'ones': 26,
+ 'each': 82,
+ 'come': 95,
+ 'growing': 11,
+ 'end': 155,
+ 'six': 10,
+ 'we': 301,
+ 'further': 25,
+ 'had': 330,
+ 'developed': 11,
+ 'cannot': 44,
+ 'his': 783,
+ 'wife': 51,
+ 'death': 64,
+ 'learning': 5,
+ 'accept': 11,
+ 'role': 94,
+ 'grandfather': 15,
+ 'even': 390,
+ 'helped': 9,
+ 'fight': 32,
+ 'past': 41,
+ 'keep': 54,
+ 'taking': 37,
+ 'face': 52,
+ 'familiar': 29,
+ 'conflict': 10,
+ 'having': 64,
+ 'story': 429,
+ 'lines': 49,
+ 'interesting': 118,
+ 'rather': 85,
+ 'heavily': 10,
+ 'four': 40,
+ 'finest': 9,
+ 'failure': 8,
+ 'box': 17,
+ 'office': 9,
+ 'b': 32,
+ 'demille': 11,
+ 'stopped': 7,
+ 'doing': 55,
+ 'non': 24,
+ 'american': 82,
+ 'history': 49,
+ 'were': 357,
+ 'our': 75,
+ 'jean': 20,
+ 'war': 62,
+ 'ii': 6,
+ 'dr': 8,
+ 'production': 45,
+ 'starring': 22,
+ 'gary': 9,
+ 'cooper': 17,
+ 'wild': 22,
+ 'bill': 26,
+ 'hickok': 10,
+ 'arthur': 14,
+ 'calamity': 10,
+ 'jane': 21,
+ 'buffalo': 12,
+ 'john': 56,
+ 'villain': 11,
+ 'usual': 20,
+ 'general': 26,
+ 'george': 43,
+ 'custer': 7,
+ 'one': 835,
+ 'indians': 5,
+ 'big': 117,
+ 'villains': 7,
+ 'led': 11,
+ 'charles': 10,
+ 'selling': 6,
+ 'arms': 5,
+ 'hall': 7,
+ 'jack': 15,
+ 'killed': 30,
+ 'basically': 22,
+ 'u': 16,
+ 'civil': 8,
+ 'lincoln': 9,
+ 'shown': 44,
+ 'start': 43,
+ 'talking': 22,
+ 'step': 10,
+ 'now': 144,
+ 'lee': 12,
+ 'talks': 8,
+ 'need': 53,
+ 'west': 17,
+ 'more': 485,
+ 'later': 80,
+ 'he': 828,
+ 'theater': 17,
+ 'april': 32,
+ 'must': 91,
+ 'busy': 24,
+ 'city': 24,
+ 'same': 133,
+ 'date': 16,
+ 'actually': 104,
+ 'concerned': 12,
+ 'immediate': 5,
+ 'thoughts': 6,
+ 'last': 93,
+ 'day': 99,
+ 'former': 20,
+ 'states': 7,
+ 'into': 260,
+ 'union': 7,
+ 'soon': 36,
+ 'possible': 32,
+ 'attention': 30,
+ 'except': 22,
+ 'problems': 25,
+ 'forces': 12,
+ 'mexico': 7,
+ 'against': 41,
+ 'involved': 25,
+ 'actual': 24,
+ 'sent': 9,
+ 'loser': 5,
+ 'second': 58,
+ 'put': 83,
+ 'serious': 40,
+ 'indian': 6,
+ 'novel': 29,
+ 'lake': 18,
+ 'jackson': 6,
+ 'turned': 25,
+ 'out': 466,
+ 'quite': 99,
+ 'effective': 14,
+ 'western': 28,
+ 'once': 78,
+ 'should': 160,
+ 'nothing': 133,
+ 'said': 70,
+ 'hardly': 19,
+ 'profound': 6,
+ 'saying': 21,
+ 'eat': 5,
+ 'good': 456,
+ 'breakfast': 6,
+ 'every': 158,
+ 'morning': 5,
+ 'your': 175,
+ 'health': 6,
+ 'statement': 7,
+ 'fact': 116,
+ 'turning': 9,
+ 'minor': 10,
+ 'ridiculous': 27,
+ 'typical': 25,
+ 'scripts': 7,
+ 'really': 321,
+ 'bad': 264,
+ 'errors': 5,
+ 'common': 20,
+ 'sense': 66,
+ 'them': 230,
+ 'mistake': 13,
+ 'adventure': 18,
+ 'full': 44,
+ 'creator': 6,
+ 'worth': 73,
+ 'political': 26,
+ 'ideas': 18,
+ 'study': 7,
+ 'human': 53,
+ 'nature': 24,
+ 'context': 13,
+ 'without': 87,
+ 'simply': 48,
+ 'everyone': 51,
+ 'finished': 12,
+ 'product': 6,
+ 'performers': 9,
+ 'worst': 86,
+ 'sequel': 19,
+ 'movies': 265,
+ 'again': 138,
+ 'doesn': 122,
+ 'killer': 81,
+ 'still': 149,
+ 'kills': 28,
+ 'fun': 57,
+ 'killing': 26,
+ 'making': 77,
+ 'happened': 28,
+ 'means': 22,
+ 'ever': 202,
+ 'don': 262,
+ 'value': 16,
+ 'hour': 33,
+ 'during': 67,
+ 'll': 86,
+ 'want': 104,
+ 'ask': 17,
+ 'him': 257,
+ 'original': 94,
+ 'makes': 131,
+ 'action': 83,
+ 'let': 54,
+ 'child': 62,
+ 'adult': 15,
+ 'impact': 6,
+ 'insult': 5,
+ 'tmnt': 7,
+ 'venus': 5,
+ 'does': 151,
+ 'never': 189,
+ 'took': 37,
+ 'away': 94,
+ 'tragic': 10,
+ 'tale': 29,
+ '4': 47,
+ 'male': 23,
+ 'family': 91,
+ 'gone': 21,
+ 'over': 212,
+ 'power': 32,
+ 'horrible': 34,
+ 'episode': 34,
+ 'voices': 7,
+ 'wrong': 47,
+ 'acted': 21,
+ 'done': 100,
+ 'job': 95,
+ 'bother': 10,
+ 'worthy': 9,
+ 'material': 23,
+ 'slow': 34,
+ 'looking': 79,
+ 'totally': 40,
+ 'shredder': 6,
+ 'dude': 5,
+ 'corny': 7,
+ 'turtles': 6,
+ 'looked': 35,
+ 'things': 95,
+ 'hanging': 9,
+ 'off': 170,
+ 'bodies': 8,
+ 'around': 83,
+ 'silly': 24,
+ 'got': 117,
+ 'rid': 6,
+ 'stupid': 59,
+ 'cartoon': 8,
+ 'sounds': 12,
+ 'writing': 36,
+ 'those': 120,
+ 'kelly': 47,
+ 'legend': 42,
+ 'hoping': 12,
+ 'accurate': 15,
+ 'creative': 10,
+ 'license': 6,
+ 'taken': 44,
+ 'naomi': 7,
+ 'existed': 6,
+ 'reality': 38,
+ 'purely': 11,
+ 'piece': 40,
+ 'entertainment': 31,
+ 'holds': 5,
+ 'title': 45,
+ 'solid': 20,
+ 'ned': 57,
+ 'hard': 85,
+ 'considering': 19,
+ 'previous': 15,
+ 'mick': 5,
+ 'jagger': 5,
+ 'australian': 22,
+ 'rules': 5,
+ 'bob': 11,
+ 'poor': 40,
+ 'location': 11,
+ 'shooting': 43,
+ 'area': 12,
+ 'live': 37,
+ 'outside': 14,
+ 'remember': 41,
+ 'golden': 14,
+ 'released': 35,
+ 'critics': 10,
+ 'm': 147,
+ 'badly': 23,
+ 'less': 63,
+ 'ended': 11,
+ 'eddie': 10,
+ 'murphy': 13,
+ 'guess': 38,
+ 'going': 124,
+ 'gets': 97,
+ 'front': 20,
+ 'blank': 19,
+ 'expression': 10,
+ 'guys': 35,
+ 'enter': 9,
+ 'sits': 6,
+ 'pull': 6,
+ 'giant': 8,
+ 'cage': 12,
+ 'stick': 14,
+ 'inside': 21,
+ 'impression': 19,
+ 'michael': 29,
+ 'give': 109,
+ 'wooden': 8,
+ 'sequence': 20,
+ 'pop': 9,
+ 'soundtrack': 29,
+ 'obviously': 29,
+ 'might': 103,
+ 'cool': 27,
+ 'seems': 126,
+ 'completely': 52,
+ 'somewhat': 26,
+ 'bloody': 7,
+ 'opening': 31,
+ 'problem': 49,
+ 'boy': 37,
+ 'whole': 96,
+ 'mood': 7,
+ 'change': 24,
+ 'different': 52,
+ 'blame': 9,
+ 'personally': 11,
+ 'pointed': 6,
+ 'producer': 15,
+ 'share': 11,
+ 'equal': 8,
+ 'did': 158,
+ 'anyone': 91,
+ 'before': 126,
+ 'fantasy': 33,
+ 'martial': 11,
+ 'arts': 10,
+ 'comedy': 100,
+ 'crap': 22,
+ 'seeing': 57,
+ 'used': 53,
+ 'attend': 6,
+ 'e': 16,
+ 'almost': 94,
+ 'forgotten': 17,
+ 'me': 319,
+ 'my': 339,
+ 'wish': 30,
+ 'tried': 21,
+ 'recently': 18,
+ 'discovered': 11,
+ 'mind': 63,
+ 'beyond': 28,
+ 'understanding': 9,
+ 'cat': 9,
+ 'extremely': 34,
+ 'truly': 59,
+ 'message': 19,
+ 'form': 23,
+ 'content': 9,
+ 'missed': 16,
+ 'fan': 60,
+ 'wave': 9,
+ 'underground': 5,
+ 'barely': 18,
+ 'closing': 5,
+ 'credits': 21,
+ 'dropped': 5,
+ 'art': 45,
+ 'youth': 6,
+ 'documentary': 26,
+ 'playing': 58,
+ 'its': 253,
+ 'relationship': 31,
+ 'real': 159,
+ 'ways': 30,
+ 'sight': 12,
+ 'al': 37,
+ 'cliver': 8,
+ 'naked': 14,
+ 'black': 92,
+ 'nelson': 5,
+ 'laura': 19,
+ 'crawford': 11,
+ 'ursula': 5,
+ 'buchfellner': 8,
+ 'kidnapped': 9,
+ 'group': 24,
+ 'ransom': 9,
+ '6': 29,
+ 'million': 15,
+ 'delivered': 8,
+ 'island': 21,
+ 'count': 15,
+ 'vietnam': 5,
+ 'hired': 7,
+ 'save': 28,
+ 'local': 8,
+ 'tribe': 8,
+ 'offer': 10,
+ 'monster': 11,
+ 'cannibal': 29,
+ 'god': 30,
+ 'eyes': 51,
+ 'filming': 17,
+ 'set': 61,
+ 'cannibals': 8,
+ 'bit': 91,
+ 'comes': 82,
+ 'thanks': 12,
+ 'mostly': 34,
+ 'hilarious': 25,
+ 'track': 15,
+ 'goofy': 5,
+ 'franco': 17,
+ 'split': 6,
+ 'interview': 8,
+ 'strong': 34,
+ 'including': 29,
+ 'whose': 29,
+ 'most': 244,
+ 'head': 47,
+ 'seen': 206,
+ 'trying': 60,
+ 'tons': 5,
+ 'gore': 23,
+ 'paint': 8,
+ 'variety': 8,
+ 'slowly': 15,
+ 'de': 17,
+ 'waves': 16,
+ 'sadly': 15,
+ 'jess': 6,
+ '40': 12,
+ 'minutes': 64,
+ 'run': 29,
+ '80': 11,
+ 'looks': 58,
+ 'nice': 57,
+ 'odd': 11,
+ 'images': 18,
+ 'darker': 6,
+ 'dialog': 20,
+ 'spanish': 14,
+ 'listen': 8,
+ 'gives': 51,
+ '16': 6,
+ 'minute': 20,
+ 'star': 94,
+ 'spoilers': 26,
+ 'wouldn': 30,
+ 'hollow': 19,
+ 'man': 205,
+ 'commercial': 10,
+ 'paul': 24,
+ 'verhoeven': 25,
+ 'kevin': 18,
+ 'bacon': 32,
+ 'elisabeth': 5,
+ 'shue': 14,
+ 'plus': 23,
+ 'theme': 35,
+ 'invisibility': 8,
+ 'premise': 19,
+ 'unfortunately': 38,
+ 'week': 13,
+ 'suspense': 15,
+ 'predictable': 32,
+ 'bunch': 13,
+ 'scientists': 5,
+ 'animals': 8,
+ 'succeeded': 8,
+ 'decides': 18,
+ 'test': 8,
+ 'himself': 60,
+ 'invisible': 36,
+ 'changes': 12,
+ 'murder': 47,
+ 'thin': 13,
+ 'line': 68,
+ 'ill': 9,
+ 'suffers': 5,
+ 'many': 207,
+ 'special': 99,
+ 'effects': 97,
+ 'lead': 36,
+ 'producers': 17,
+ 'thriller': 23,
+ 'giving': 28,
+ 'damn': 8,
+ 'admit': 17,
+ 'fx': 6,
+ 'awesome': 13,
+ 'matrix': 7,
+ 'enough': 97,
+ 'directors': 17,
+ 'care': 39,
+ 'spectacular': 7,
+ 'few': 95,
+ 'perfectly': 14,
+ 'fabulous': 11,
+ 'plot': 212,
+ 'starship': 5,
+ 'troopers': 6,
+ 'p': 9,
+ 'reasons': 25,
+ 'why': 122,
+ 'joke': 19,
+ 'woman': 103,
+ 'won': 47,
+ 'spoil': 7,
+ 'moment': 30,
+ 'okay': 15,
+ 'went': 37,
+ 'beginning': 41,
+ 'die': 20,
+ 'course': 77,
+ 'dying': 5,
+ 'low': 52,
+ 'rule': 5,
+ 'somebody': 12,
+ 'alone': 36,
+ 'lab': 13,
+ 'perfect': 40,
+ 'victim': 15,
+ 'example': 42,
+ 'ending': 58,
+ 'absolutely': 51,
+ 'hits': 10,
+ 'falls': 27,
+ 'ground': 10,
+ 'leave': 22,
+ 'quietly': 5,
+ 'attacks': 5,
+ 'kill': 33,
+ 'screams': 6,
+ 'heard': 38,
+ 'explosion': 5,
+ 'ago': 36,
+ 'suddenly': 30,
+ 'hear': 13,
+ 'above': 23,
+ 'mr': 26,
+ 'supposed': 43,
+ '10': 126,
+ 'awful': 50,
+ 'theory': 16,
+ 'directed': 23,
+ 'chick': 15,
+ 'o': 13,
+ 'r': 11,
+ 'g': 8,
+ 'thousand': 6,
+ 'picture': 67,
+ 'sound': 48,
+ 'rated': 16,
+ 'c': 15,
+ 'aren': 33,
+ 'negative': 9,
+ 'scores': 7,
+ 'imdb': 24,
+ 'com': 8,
+ 'rating': 22,
+ 'system': 12,
+ 'ps': 7,
+ 'called': 47,
+ 'etc': 29,
+ 'another': 137,
+ 'warning': 17,
+ 'following': 19,
+ 'superb': 22,
+ 'base': 6,
+ 'events': 20,
+ 'filmed': 27,
+ 'presumably': 5,
+ 'largely': 11,
+ 'canadian': 13,
+ 'crew': 21,
+ 'caught': 19,
+ 'half': 47,
+ 'thoroughly': 12,
+ 'blatant': 5,
+ 'historical': 37,
+ 'propaganda': 6,
+ 'susan': 6,
+ 'sarandon': 7,
+ 'assume': 6,
+ 'born': 8,
+ 'heroes': 11,
+ 'small': 44,
+ 'private': 9,
+ 'based': 37,
+ 'air': 13,
+ 'dislike': 6,
+ 'neil': 16,
+ 'simon': 22,
+ 'among': 28,
+ 'entertaining': 33,
+ 'comedies': 23,
+ 'watched': 60,
+ 'connection': 7,
+ 'meet': 26,
+ 'ah': 6,
+ 'afraid': 14,
+ 'changed': 20,
+ 'men': 52,
+ 'dull': 19,
+ 'stars': 54,
+ 'review': 17,
+ 'living': 41,
+ 'grandmother': 5,
+ 'walter': 32,
+ 'matthau': 63,
+ 'magnificent': 12,
+ 'secondly': 9,
+ 'burns': 62,
+ 'somehow': 18,
+ 'late': 42,
+ 'enjoyed': 41,
+ 'although': 73,
+ 'recognize': 9,
+ 'remarkable': 9,
+ 'top': 61,
+ 'laugh': 37,
+ 'turn': 39,
+ 'pleasure': 13,
+ 'roughly': 5,
+ 'knew': 31,
+ 'nazi': 14,
+ 'everybody': 24,
+ 'speaking': 12,
+ 'danish': 16,
+ 'decided': 21,
+ 'check': 40,
+ ...}
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Removing the words that occur less than five times</p>
+<pre><code class="language-python">def occurence_less_than_five(data,occurence):
+    for i,v in enumerate(data):
+        new_vocab=[]
+        for line in v.split():
+            if line in occurence.keys():
+                new_vocab.append(line)
+        new_vocab=' '.join(new_vocab)
+        data[i]=new_vocab
+    return data
+</code></pre>
+<pre><code class="language-python">X_train=occurence_less_than_five(X_train,word_vocab)
+</code></pre>
+<pre><code class="language-python">#X_train[0]
+after_remove_word_vocab=build_freq_and_vocab(X_train)
+print(&quot;Length of word vocab after removing occurence less than 5\n&quot;len(after_remove_word_vocab))
+</code></pre>
+<pre><code>Length of word vocab after removing occurence less than 5
+26300
+</code></pre>
+<pre><code class="language-python">def Word_Prob(word):
+    word_rev = 0
+    total_rev = 0
+    for class_label in word:
+        total_rev= total_rev+len(word_vocab[word])           
+        for rev in class_label[word]:
+            if word in rev:
+                word_rev=+1
+    prob = word_rev/total_rev 
+    return prob
+#to calculate number of documents that has a particular word
+def word_in_doc(X,word_vocab):
+    vocab_list={}
+    for word in word_vocab.keys():
+        count=0
+        for line in X:
+            if word in line:
+                count+=1
+        vocab_list[word]=count
+    return vocab_list
+</code></pre>
+<pre><code class="language-python">word_in_document=word_in_doc(X_train,word_vocab)
+#len(word_in_document)
+</code></pre>
+<pre><code class="language-python">#P[the]=# of doc containing the/total no . of doc
+def denom_prob_count(datab,word):
+    if word not in word_in_document.keys():
+        count=0
+    else:
+        count=word_in_document[word]
+    return count/len(X_train)
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Probability(the)=no.of docs containing 'the'/total documents</p>
+<pre><code class="language-python">denom=denom_prob_count(X_train,'the')
+print(&quot;P[the]=No.of documents containing 'the'/ Total number of documents&quot;)
+print(denom)
+</code></pre>
+<pre><code>P[the]=No.of documents containing 'the'/ Total number of documents
+0.9962546816479401
+</code></pre>
+<pre><code class="language-python">
+def word_in_doc_count(X,Y,occurence,sent):
+    word_pos_count={}
+    word_neg_count={}
+    
+    if sent=='positive':
+        for word in occurence.keys():
+            cn=0
+            for i,rev in enumerate(X):
+                if word in rev.split() and Y[i]==1:
+                    cn+=1
+            word_pos_count[word]=cn
+        return word_pos_count
+
+    if sent=='negative':
+        for word in occurence.keys():
+            cn=0
+            for i,rev in enumerate(X):
+                if word in rev.split() and Y[i]==0:
+                    cn+=1
+            word_neg_count[word]=cn
+        return word_neg_count
+
+    
+</code></pre>
+<pre><code class="language-python">wordneg=word_in_doc_count(X_train,Y_train,word_vocab,sent=&quot;negative&quot;)
+wordpos=word_in_doc_count(X_train,Y_train,word_vocab,sent=&quot;positive&quot;)
+</code></pre>
+<pre><code class="language-python">#total length of positive and negative documents
+
+def prob_document_length(Y_train):
+    len_pos=0
+    len_neg=0
+    for i in range(len(Y_train)):
+        if(Y_train[i]==1):
+            len_pos+=1
+        else:
+            len_neg+=1
+    return(len_pos),(len_neg)
+
+len_pos,len_neg=prob_document_length(Y_train)
+#print(len(Y_train))
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Finding P(the|pos) or probability or word given a sentiment</p>
+<pre><code class="language-python">#number of the word in positive or negative document
+def numerat(word,sent):
+    if sent=='positive':
+        if word not in wordpos.keys():
+            count=0
+        else:
+            count=wordpos[word]
+            
+    elif sent=='negative':
+        if word not in wordneg.keys():
+            count=0
+        else:
+            count=wordneg[word]
+
+    return count
+
+</code></pre>
+<pre><code class="language-python">##eg: P(the|positive)
+
+numerator=numerat('the',sent='positive')
+prob=numerator/len_pos
+print(prob)
+</code></pre>
+<pre><code>0.9925
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Building the naive bayes model</p>
+<pre><code class="language-python">def NB(X_train,Y_train,word,flag_smooth,sent):
+    #naiv_prob=0
+    if sent=='positive':
+        
+        num1=(numerat(word,sent))/len_pos
+        num2=len_pos/len(Y_train)
+        a=(num1*num2)
+        den=denom_prob_count(X_train,word)
+        den_actual=den if den!=0 else 0.001
+        if flag_smooth==True:
+            a_new=a+1
+            
+            d_new=den_actual
+            naiv_prob=a_new/float(d_new)   
+        else:
+            naiv_prob=a/float(den_actual) 
+    
+    elif sent=='negative':
+        num1=(numerat(word,sent))/len_neg
+        num2=len_neg/len(Y_train)
+        a=(num1*num2)
+        den=denom_prob_count(X_train,word) 
+        den_actual=den if den!=0 else 0.001
+        if flag_smooth==True:
+            a_new=a+1
+            d_new=den_actual+2
+            naiv_prob=a_new/float(d_new)
+        else:
+            naiv_prob=a/float(den_actual)
+    #print(naiv_prob)        
+    return naiv_prob
+    
+</code></pre>
+<pre><code class="language-python">#example of naive bayes
+
+r=NB(X_train,Y_train,'the',True,sent='positive')
+print(r)
+</code></pre>
+<pre><code>0.49916666666666665
+</code></pre>
+<pre><code class="language-python">def NB_all(X_train,Y_train,test,flag_smooth):
+    sum1=1
+    sum2=1
+    y_pred=[]
+    for i,v in enumerate(test):
+        for word in v.split():
+            sum1=(sum1*NB(X_train,Y_train,word,flag_smooth,sent=&quot;positive&quot;))
+            sum2=(sum2*NB(X_train,Y_train,word,flag_smooth,sent=&quot;negative&quot;,))
+        if(sum1&lt;sum2):
+            y_pred.append(0)
+            #print(&quot;negative&quot;)
+        else:
+            y_pred.append(1)
+            #print(&quot;positive&quot;)
+        #print(&quot;sum&quot;,sum1,sum2)
+    return(y_pred)
+</code></pre>
+<pre><code class="language-python">def accuracy_score(actual,predicted):
+    count=0
+    for i in range(len(actual)):
+        if(actual[i]==predicted[i]):
+            count+=1
+
+    return count/float(len(actual))
+        
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:16px;text-align:center;>Calculating the accuracy of the development dataset</p>
+<p style="font-family:Georgia;font-size:15.3px;text-align:center;">As we can see we can make improvements if we tune our hyperparameters</p>
+<pre><code class="language-python">#print(pred)
+pred=NB_all(X_train,Y_train,X_dev,flag_smooth=False)
+score=accuracy_score(Y_dev,pred)
+print(&quot;Accuracy of the development data set without smoothing &quot;,(score*100))
+</code></pre>
+<pre><code>Accuracy of the development data set without smoothing  50.24875621890548
+</code></pre>
+<pre><code class="language-python">len_pos,len_neg=prob_document_length(Y_train)
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Deriving the top ten positive words</p>
+<pre><code class="language-python">import operator
+pos={}
+neg={}
+#root=[]
+for word in word_vocab.keys():
+    top_pos=NB(X_train,Y_train,word,False,sent='positive')
+    top_neg=NB(X_train,Y_train,word,False,sent='negative')
+    pos[word]=top_pos
+    neg[word]=top_neg
+#Reference:https://stackoverflow.com/questions/7197315/5-maximum-values-in-a-python-dictionary
+top_pos_10=dict(sorted(pos.items(),key=operator.itemgetter(1), reverse=True)[:10])
+top_neg_10=dict(sorted(neg.items(),key=operator.itemgetter(1), reverse=False)[:10])
+
+</code></pre>
+<pre><code class="language-python">print(&quot;top 10 positive words::&quot;)
+for word in top_pos_10.keys():
+    print(word)
+</code></pre>
+<pre><code>top 10 positive words::
+custer
+tsui
+depicted
+georgia
+patricia
+plots
+willy
+alicia
+resort
+religion
+</code></pre>
+<pre><code class="language-python">print(&quot;top 10 negative words::&quot;)
+for word in top_neg_10.keys():
+    print(word)
+</code></pre>
+<pre><code>top 10 negative words::
+goldberg
+retired
+finest
+demille
+ii
+custer
+lincoln
+busy
+immediate
+attend
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Comparing the effects of smoothing</p>
+<p style="font-family:Georgia;font-size:15.3px;">Considering the optimal hyperparameter , smoothing increases the accuracy of our model</p>
+<pre><code class="language-python">pred=NB_all(X_train,Y_train,X_test,flag_smooth=False)
+score=accuracy_score(Y_test,pred)
+#pred=NB_all(X_train,Y_train,X_train,flag_smooth=True)
+#score=accuracy_score(Y_train,pred)
+print(score*100)
+</code></pre>
+<pre><code>57.496
+</code></pre>
+<p style=background-color:#6aa2de;font-weight:bold;font-size:15px;text-align:center;>Using the test dataset</p>
+<pre><code class="language-python">pred=NB_all(X_train,Y_train,X_test,flag_smooth=True)
+score=accuracy_score(Y_train,pred)
+#pred=NB_all(X_train,Y_train,X_test,flag_smooth=False)
+#score=accuracy_score(Y_test,pred)
+print(&quot;Probabiity of the dataset after optimal hyperparameters and smoothing \n&quot;,score*100)
+</code></pre>
+<pre><code>Probabiity of the test dataset after optimal hyperparameters and smoothing
+64.763
+</code></pre>
+<p style=font-weight:bold;>We have seen that Naive Bayes can be used extensively for text categorization and solving the problem or whether a document belongs to one sentiment or another.Some problems faced during the implemetation of this assignment were targeting a large dataset.<br />We can see that the smoothing increases the accuracy slightly and we can compile a better probabilistic model if smoothing(eg.Laplace) is done.To further improve accuracy we can use some tactics like vectorisation or lemmatizing our words.Naive Bayes as a whole certainly aids to classify a text dataset in those aspects</p>
+<p>References:
+<a href="https://towardsdatascience.com/unfolding-na%C3%AFve-bayes-from-scratch-2e86dcae4b01#08ef">https://towardsdatascience.com/unfolding-na%C3%AFve-bayes-from-scratch-2e86dcae4b01#08ef</a></p>
+<p><a href="https://machinelearningmastery.com/naive-bayes-classifier-scratch-python/">https://machinelearningmastery.com/naive-bayes-classifier-scratch-python/</a></p>
+<p><a href="https://machinelearningmastery.com/load-machine-learning-data-scratch-python/">https://machinelearningmastery.com/load-machine-learning-data-scratch-python/</a></p>
+<p><a href="https://machinelearningmastery.com/implement-resampling-methods-scratch-python/">https://machinelearningmastery.com/implement-resampling-methods-scratch-python/</a></p>
+<pre><code class="language-python">
+</code></pre>
+
     </div>
 
     
@@ -667,7 +2175,7 @@
       
       
       <li>
-        <a href="https://twitter.com/intent/tweet?url=https://sushantmhambrey.github.io/post/assn3/&amp;text=Assignment3" target="_blank" rel="noopener" class="share-btn-twitter">
+        <a href="https://twitter.com/intent/tweet?url=https://sushantmhambrey.github.io/post/assn3/&amp;text=Naive%20Bayes%20from%20Scratch" target="_blank" rel="noopener" class="share-btn-twitter">
           <i class="fab fa-twitter"></i>
         </a>
       </li>
@@ -680,7 +2188,7 @@
       
       
       <li>
-        <a href="https://www.facebook.com/sharer.php?u=https://sushantmhambrey.github.io/post/assn3/&amp;t=Assignment3" target="_blank" rel="noopener" class="share-btn-facebook">
+        <a href="https://www.facebook.com/sharer.php?u=https://sushantmhambrey.github.io/post/assn3/&amp;t=Naive%20Bayes%20from%20Scratch" target="_blank" rel="noopener" class="share-btn-facebook">
           <i class="fab fa-facebook"></i>
         </a>
       </li>
@@ -693,7 +2201,7 @@
       
       
       <li>
-        <a href="mailto:?subject=Assignment3&amp;body=https://sushantmhambrey.github.io/post/assn3/" target="_blank" rel="noopener" class="share-btn-email">
+        <a href="mailto:?subject=Naive%20Bayes%20from%20Scratch&amp;body=https://sushantmhambrey.github.io/post/assn3/" target="_blank" rel="noopener" class="share-btn-email">
           <i class="fas fa-envelope"></i>
         </a>
       </li>
@@ -706,7 +2214,7 @@
       
       
       <li>
-        <a href="https://www.linkedin.com/shareArticle?url=https://sushantmhambrey.github.io/post/assn3/&amp;title=Assignment3" target="_blank" rel="noopener" class="share-btn-linkedin">
+        <a href="https://www.linkedin.com/shareArticle?url=https://sushantmhambrey.github.io/post/assn3/&amp;title=Naive%20Bayes%20from%20Scratch" target="_blank" rel="noopener" class="share-btn-linkedin">
           <i class="fab fa-linkedin-in"></i>
         </a>
       </li>
@@ -719,7 +2227,7 @@
       
       
       <li>
-        <a href="https://web.whatsapp.com/send?text=Assignment3%20https://sushantmhambrey.github.io/post/assn3/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+        <a href="https://web.whatsapp.com/send?text=Naive%20Bayes%20from%20Scratch%20https://sushantmhambrey.github.io/post/assn3/" target="_blank" rel="noopener" class="share-btn-whatsapp">
           <i class="fab fa-whatsapp"></i>
         </a>
       </li>
@@ -732,7 +2240,7 @@
       
       
       <li>
-        <a href="https://service.weibo.com/share/share.php?url=https://sushantmhambrey.github.io/post/assn3/&amp;title=Assignment3" target="_blank" rel="noopener" class="share-btn-weibo">
+        <a href="https://service.weibo.com/share/share.php?url=https://sushantmhambrey.github.io/post/assn3/&amp;title=Naive%20Bayes%20from%20Scratch" target="_blank" rel="noopener" class="share-btn-weibo">
           <i class="fab fa-weibo"></i>
         </a>
       </li>
