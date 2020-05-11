@@ -1533,6 +1533,276 @@ print(&amp;quot;Probabiity of the dataset after optimal hyperparameters and smoo
     </item>
     
     <item>
+      <title>Twitter Real or Not prediction</title>
+      <link>https://sushantmhambrey.github.io/post/twitter/</link>
+      <pubDate>Mon, 10 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>https://sushantmhambrey.github.io/post/twitter/</guid>
+      <description>&lt;p&gt;Importing the necessary libraries&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import numpy as np 
+import pandas as pd 
+import os
+import seaborn as sns
+import string
+import csv
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn import linear_model
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Loading the training and test data using pandas library&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;from sklearn.model_selection import train_test_split
+train = pd.read_csv(&#39;../input/nlp-getting-started/train.csv&#39;)
+test = pd.read_csv(&#39;../input/nlp-getting-started/test.csv&#39;)
+submit = pd.read_csv(&amp;quot;/kaggle/input/nlp-getting-started/sample_submission.csv&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Reading the first five values of the training dataset&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;train.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;id&lt;/th&gt;
+      &lt;th&gt;keyword&lt;/th&gt;
+      &lt;th&gt;location&lt;/th&gt;
+      &lt;th&gt;text&lt;/th&gt;
+      &lt;th&gt;target&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Our Deeds are the Reason of this #earthquake M...&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Forest fire near La Ronge Sask. Canada&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;5&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;All residents asked to &#39;shelter in place&#39; are ...&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;6&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;13,000 people receive #wildfires evacuation or...&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;7&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;NaN&lt;/td&gt;
+      &lt;td&gt;Just got sent this photo from Ruby #Alaska as ...&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print (train.shape, test.shape, submit.shape)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;(7613, 5) (3263, 4) (3263, 2)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Looking at the count of the null values&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;print(train.isnull().sum())
+print(test.isnull().sum())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;id             0
+keyword       61
+location    2533
+text           0
+target         0
+dtype: int64
+id             0
+keyword       26
+location    1105
+text           0
+dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import matplotlib.pyplot as plt
+sns.countplot(y=train.target)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;matplotlib.axes._subplots.AxesSubplot at 0x7fbc0ccb6cc0&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./twitter_9_1.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Looking at some examples of training before cleaning the text&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;train[&#39;text&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0       Our Deeds are the Reason of this #earthquake M...
+1                  Forest fire near La Ronge Sask. Canada
+2       All residents asked to &#39;shelter in place&#39; are ...
+3       13,000 people receive #wildfires evacuation or...
+4       Just got sent this photo from Ruby #Alaska as ...
+                              ...                        
+7608    Two giant cranes holding a bridge collapse int...
+7609    @aria_ahrary @TheTawniest The out of control w...
+7610    M1.94 [01:04 UTC]?5km S of Volcano Hawaii. htt...
+7611    Police investigating after an e-bike collided ...
+7612    The Latest: More Homes Razed by Northern Calif...
+Name: text, Length: 7613, dtype: object
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Defining a function to clean the dataset&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import re
+def clean(text):
+    text=re.sub(r&#39;https?://\S+&#39;, &#39;&#39;, text)
+    text=re.sub(r&#39;&amp;lt;.*?&amp;gt;&#39;,&#39;&#39;,text) 
+    text=re.sub(r&#39;\n&#39;,&#39; &#39;, text)
+    text=re.sub(&#39;\s+&#39;, &#39; &#39;, text).strip()
+    return text
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;train[&#39;text&#39;] = train[&#39;text&#39;].apply(lambda x : clean(x))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Looking at the examples after cleaning the dataset&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;train[&#39;text&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0       Our Deeds are the Reason of this #earthquake M...
+1                  Forest fire near La Ronge Sask. Canada
+2       All residents asked to &#39;shelter in place&#39; are ...
+3       13,000 people receive #wildfires evacuation or...
+4       Just got sent this photo from Ruby #Alaska as ...
+                              ...                        
+7608    Two giant cranes holding a bridge collapse int...
+7609    @aria_ahrary @TheTawniest The out of control w...
+7610           M1.94 [01:04 UTC]?5km S of Volcano Hawaii.
+7611    Police investigating after an e-bike collided ...
+7612    The Latest: More Homes Razed by Northern Calif...
+Name: text, Length: 7613, dtype: object
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def remove_emoji(text):
+    emoji_pattern = re.compile(&amp;quot;[&amp;quot;
+                           u&amp;quot;\U0001F600-\U0001F64F&amp;quot;  # emoticons
+                           u&amp;quot;\U0001F300-\U0001F5FF&amp;quot;  # symbols &amp;amp; pictographs
+                           u&amp;quot;\U0001F680-\U0001F6FF&amp;quot;  # transport &amp;amp; map symbols
+                           u&amp;quot;\U0001F1E0-\U0001F1FF&amp;quot;  # flags (iOS)
+                           u&amp;quot;\U00002702-\U000027B0&amp;quot;
+                           u&amp;quot;\U000024C2-\U0001F251&amp;quot;
+                           &amp;quot;]+&amp;quot;, flags=re.UNICODE)
+    return emoji_pattern.sub(r&#39;&#39;, text)
+
+train[&#39;text&#39;] = train[&#39;text&#39;].apply(lambda x: remove_emoji(x))
+
+
+# Reference : https://gist.github.com/slowkow/7a7f61f495e3dbb7e3d767f97bd7304b
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;train[&#39;text&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0       Our Deeds are the Reason of this #earthquake M...
+1                  Forest fire near La Ronge Sask. Canada
+2       All residents asked to &#39;shelter in place&#39; are ...
+3       13,000 people receive #wildfires evacuation or...
+4       Just got sent this photo from Ruby #Alaska as ...
+                              ...                        
+7608    Two giant cranes holding a bridge collapse int...
+7609    @aria_ahrary @TheTawniest The out of control w...
+7610           M1.94 [01:04 UTC]?5km S of Volcano Hawaii.
+7611    Police investigating after an e-bike collided ...
+7612    The Latest: More Homes Razed by Northern Calif...
+Name: text, Length: 7613, dtype: object
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;def remove_punct(text):
+    table=str.maketrans(&#39;&#39;,&#39;&#39;,string.punctuation)
+    return text.translate(table)
+
+#train_data[&#39;text&#39;] = train_data[&#39;text&#39;].apply(lambda x : remove_punct(x)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Assigning x to our text and y to our target column&lt;/p&gt;
+&lt;p&gt;Splitting the training and testing dataset/&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;x = train[&amp;quot;text&amp;quot;]
+y = train[&amp;quot;target&amp;quot;]
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We need to vectorize the training dataset examples&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;vectorize = CountVectorizer(stop_words = &#39;english&#39;)
+x_vector_train = vectorize.fit_transform(X_train)
+x_vector_test = vectorize.transform(X_test)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our first model is the multinomial Naive Bayes model. Using the fit and predict methods and calculating the accuracy&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;model = MultinomialNB()
+model.fit(x_vector_train, y_train)
+prediction = model.predict(x_test_cv)
+acc=accuracy_score(y_test,prediction)
+print(acc)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.7892317793827971
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We will test one more model called as Ridge Classifier and printing the accuracy&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;clf =  linear_model.RidgeClassifier()
+clf.fit(x_vector_train, y_train)
+prediction1=clf.predict(x_test_cv)
+acc1=accuracy_score(y_test,prediction1)
+print(acc1)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.768220617202889
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we can see Multinomial Naive Bayes model performs a little better than Naive Bayes model by almost 2 percentage. Thus we will use that model to make our submission file&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#predicting on the test values
+x_test=test[&amp;quot;text&amp;quot;]
+
+#vectorizing the data
+x_test_vector=vectorize.transform(x_test)
+
+#making predictions
+prediction=model.predict(x_test_vector)
+
+#making submission
+submit[&amp;quot;target&amp;quot;]=prediction
+
+print(submit.head(10))
+
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;   id  target
+0   0       1
+1   2       1
+2   3       1
+3   9       1
+4  11       1
+5  12       1
+6  21       0
+7  22       0
+8  27       0
+9  29       0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;submit.to_csv(&amp;quot;submission.csv&amp;quot;,index=False)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Data Pipeline </title>
       <link>https://sushantmhambrey.github.io/project/pipe/</link>
       <pubDate>Wed, 29 Jan 2020 23:00:49 -0600</pubDate>
