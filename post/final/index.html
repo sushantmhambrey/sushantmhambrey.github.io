@@ -609,7 +609,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    12 min read
+    11 min read
   </span>
   
 
@@ -645,9 +645,9 @@
   <div class="article-container">
 
     <div class="article-style">
-      <h1 >**Data Mining Project Spring 2020**</h1>
+      <h1 style=background-color:#ff7814;font-weight:bold;font-size:16px;text-align:center;>**Data Mining Project Spring 2020**</h1>
 <p>The purpose of the term project is to predict the ratings given a particular review. Throughout the implementation of the term project many models were tested and based on the various evaluation metrics a model was selected. The dataset is taken from Kaggle BGG review dataset . Due to the vast length of dataset Google Colaboratory was used as the implementation platform<p>
-<pre><code>#Linking colab to google drive where the dataset is saved
+<pre><code class="language-python">#Linking colab to google drive where the dataset is saved
 from google.colab import drive
 import zipfile
 #Mount the drive
@@ -656,12 +656,12 @@ drive.mount('/content/gdrive')
 <pre><code>Drive already mounted at /content/gdrive; to attempt to forcibly remount, call drive.mount(&quot;/content/gdrive&quot;, force_remount=True).
 </code></pre>
 <p>Extracting tar file using zipfile module. We have a huge dataset (around 13 million rows)</p>
-<pre><code>zip_ref = zipfile.ZipFile(&quot;/content/gdrive/My Drive/Colab Notebooks/bgg-13m-reviews.zip&quot;, 'r')
+<pre><code class="language-python">zip_ref = zipfile.ZipFile(&quot;/content/gdrive/My Drive/Colab Notebooks/bgg-13m-reviews.zip&quot;, 'r')
 zip_ref.extractall(&quot;/tmp&quot;)
 zip_ref.close()
 </code></pre>
 <p> Importing the necessary libraries </p>
-<pre><code>import numpy as np
+<pre><code class="language-python">import numpy as np
 import pandas as pd
 import string 
 import re 
@@ -674,19 +674,19 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
 </code></pre>
 <p>Specifying the path where the csv file is stored</p>
-<pre><code>path='/tmp/bgg-13m-reviews.csv'
+<pre><code class="language-python">path='/tmp/bgg-13m-reviews.csv'
 </code></pre>
 <p>Reading the csv file as a data frame using the pandas module.In the read_csv we can specify nrows which indicates how many rows need to be read</p>
-<pre><code>df = pd.read_csv(path, delimiter=',')
+<pre><code class="language-python">df = pd.read_csv(path, delimiter=',')
 nRow, nCol = df.shape
 #print(f'There are {nRow} rows and {nCol} columns')
 </code></pre>
 <p>The first part of the project is just analysis of the data file to see how the ratings class is spread. The spread is quite lobsided toward a seven rating which is tackled later in the notebook. Textual data like the comment section of the BGG requires a considerable ammount of preprocessing. Cleaning techniques like removal of punctuation, returing string.lower() and removal of NaN values is used.</p>
-<pre><code>df=df.dropna()
+<pre><code class="language-python">df=df.dropna()
 #print(df.count())
 </code></pre>
 <p>Seeing how our data frame looks like.The two main columns we are going to use in the project are comment and rating.</p>
-<pre><code>df.head()
+<pre><code class="language-python">df.head()
 </code></pre>
 <div>
 <style scoped>
@@ -763,20 +763,20 @@ nRow, nCol = df.shape
   </tbody>
 </table>
 </div>
-<pre><code>df['rating'].hist(bins=10)
+<pre><code class="language-python">df['rating'].hist(bins=10)
 plt.xlabel('rating of review')
 plt.ylabel('number of reviews')
 plt.show()
 </code></pre>
 <p><img src="./final_14_0.png" alt="png"></p>
-<pre><code>plt.figure(figsize=(20, 7))
+<pre><code class="language-python">plt.figure(figsize=(20, 7))
 df['name'].value_counts()[:30].plot(kind='bar',color=&quot;skyblue&quot;)
 plt.ylabel('Count of Rating')
 plt.title('Top 30 Rated Games')
 plt.show()
 </code></pre>
 <p><img src="./final_15_0.png" alt="png"></p>
-<pre><code>from wordcloud import WordCloud
+<pre><code class="language-python">from wordcloud import WordCloud
 text = df.comment[0]
 
 # Create and generate a word cloud image:
@@ -788,12 +788,12 @@ plt.axis(&quot;off&quot;)
 plt.show()
 </code></pre>
 <p><img src="./final_16_0.png" alt="png"></p>
-<pre><code>from nltk.corpus import stopwords
+<pre><code class="language-python">from nltk.corpus import stopwords
 from sklearn.feature_extraction import text
 stop = text.ENGLISH_STOP_WORDS
 </code></pre>
 <p>Preprocessing the text. We remove white spaces, punctuations, stopwords and make the string lowercase</p>
-<pre><code>def remove_noise(text):
+<pre><code class="language-python">def remove_noise(text):
     
     text = text.apply(lambda x: &quot; &quot;.join(x.lower() for x in x.split()))
     
@@ -807,7 +807,7 @@ stop = text.ENGLISH_STOP_WORDS
 df['comment'] = remove_noise(df['comment'])
 </code></pre>
 <p>Checking the dataframe after cleaning</p>
-<pre><code>df.head()
+<pre><code class="language-python">df.head()
 #print(df.info())
 </code></pre>
 <div>
@@ -885,7 +885,7 @@ df['comment'] = remove_noise(df['comment'])
   </tbody>
 </table>
 </div>
-<pre><code>def get_top_n_words(corpus, n=None):
+<pre><code class="language-python">def get_top_n_words(corpus, n=None):
     vec = CountVectorizer(stop_words = 'english').fit(corpus)
     bag_of_words = vec.transform(corpus)
     sum_words = bag_of_words.sum(axis=0) 
@@ -901,7 +901,7 @@ for word, freq in common_words:
 
 </code></pre>
 <p>As we can see , after removing the stopwords these are our top 30 words</p>
-<pre><code>df2
+<pre><code class="language-python">df2
 </code></pre>
 <div>
 <style scoped>
@@ -1079,21 +1079,21 @@ for word, freq in common_words:
   </tbody>
 </table>
 </div>
-<pre><code>df2['ReviewText'].value_counts()[:30].plot(kind='bar',color=&quot;skyblue&quot;)
+<pre><code class="language-python">df2['ReviewText'].value_counts()[:30].plot(kind='bar',color=&quot;skyblue&quot;)
 plt.xlabel('rating of review')
 plt.ylabel('number of reviews')
 plt.show()
 </code></pre>
 <p><img src="./final_25_0.png" alt="png"></p>
-<pre><code>#counting the number of ratings to each number
+<pre><code class="language-python">#counting the number of ratings to each number
 from collections import Counter
 rate = df['rating'].values
 rate=rate.astype(int)
 </code></pre>
 <p>Our data is arranged such that all the ratings are in ascending order thus we need to shuffle the data before splitting into training and test sets</p>
-<pre><code>df = df.sample(frac=1).reset_index(drop=True)
+<pre><code class="language-python">df = df.sample(frac=1).reset_index(drop=True)
 </code></pre>
-<pre><code>df1=df.sample(n=16000)
+<pre><code class="language-python">df1=df.sample(n=16000)
 print(df1.count())
 </code></pre>
 <pre><code>Unnamed: 0    16000
@@ -1105,33 +1105,22 @@ name          16000
 dtype: int64
 </code></pre>
 <p>Assigning &lsquo;x&rsquo; to the comment section and &lsquo;y&rsquo; to the rating section of our data frame</p>
-<pre><code>x=df1['comment'].values
+<pre><code class="language-python">x=df1['comment'].values
 y=np.round(df1['rating'].values)
 </code></pre>
-<pre><code>from sklearn.model_selection import train_test_split
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
 </code></pre>
 <p>Just a look at how our X_test looks. We need to vectorise the data because ML models require vector represenation of texts</p>
-<pre><code>X_test
-</code></pre>
-<pre><code>array(['solo good players 8 3 players 65 4 players unplayable like wheel whitout classic boring card game unfortunately like control strategy play game player 34 uncontrollable strongly recommend play excellent materials',
-       'old town solo',
-       'neutral occasion huge toyparty value good production quality game merely ok feels like doesnt realize potentialof game idea suspect replayability novelty value',
-       ...,
-       'fun chillout warmup game simple rules allow quick learnasyouplay plenty replayability character significantly overpowering decent strategy simple game fun ages issue game elimination player left watch rest battle code fairplay fun stopping ganging single character player sit rest gametime',
-       'auction',
-       'great light dexterity game play kids definitely takes skill especially lanes like shallow troughs instead flat game equalized somewhat played 4 players making lane longer different ways play game nice supports 24 players'],
-      dtype=object)
-</code></pre>
 <p>For textutal data to be processed it needs to be coverted into a vector matrix representation.But just calculating the count(or frequency) of the terms might result in percieving all the terms as equally important. The TF-IDF vectorizer attenuates the terms whose occurence is common and not of much relevance and gives importance to more relevant terms.Mathematically speaking Tf is ratio of number of times a word occurred in a document to the total number of words in the document. and IDF is the log of total docs divided by docs containing the word.</p>
 <p><img src="https://www.joyofdata.de/blog/wp-content/uploads/2014/02/tf-idf.png" alt="alt text"></p>
 <p>Vectorising the data</p>
-<pre><code>vect = TfidfVectorizer(stop_words = 'english',max_df=0.7,max_features=10000)
+<pre><code class="language-python">vect = TfidfVectorizer(stop_words = 'english',max_df=0.7,max_features=10000)
 x_train_cv = vect.fit_transform(X_train)
 x_test_cv = vect.transform(X_test)
 </code></pre>
 <p>Trying of the different ML modules now</p>
-<pre><code>from sklearn.naive_bayes import MultinomialNB
+<pre><code class="language-python">from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import RidgeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.externals import joblib
@@ -1139,7 +1128,7 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 </code></pre>
-<pre><code>accuracy_all=[]
+<pre><code class="language-python">accuracy_all=[]
 print(accuracy_all)
 </code></pre>
 <pre><code>[]
@@ -1149,7 +1138,7 @@ One of the most simple Naive Bayes model is the Gaussian Naive Bayes model becau
 <p>$$
 P(c|d) =P(c) \prod_{k=1}^n P(t_k|c)
 $$</p>
-<pre><code>#Implementing MultinomialNB
+<pre><code class="language-python">#Implementing MultinomialNB
 model = MultinomialNB()
 model.fit(x_train_cv, y_train.astype('int'))
 value = model.predict(x_test_cv)
@@ -1158,11 +1147,11 @@ print(&quot;accuracy of Naive Bayes&quot;,accuracy_NB)
 </code></pre>
 <pre><code>accuracy of Naive Bayes 0.2914583333333333
 </code></pre>
-<pre><code>
+<pre><code class="language-python">
 disp=plot_confusion_matrix(model, x_test_cv, y_test)
 </code></pre>
 <p><img src="./final_43_0.png" alt="png"></p>
-<pre><code>print(&quot;Classification report for Multinomial Naive Bayes \n&quot;,classification_report(y_test,value))
+<pre><code class="language-python">print(&quot;Classification report for Multinomial Naive Bayes \n&quot;,classification_report(y_test,value))
 </code></pre>
 <pre><code>Classification report for Multinomial Naive Bayes 
                precision    recall  f1-score   support
@@ -1189,7 +1178,7 @@ weighted avg       0.20      0.29      0.22      4800
 </code></pre>
 <p>The next model we use is the Support Vector Machine methodolgy. SVM model is mostly used for discriminative classification as opposed to generative classification.We use the scikit learns SVM module to train our model.</p>
 <p><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/SVM_margin.png/300px-SVM_margin.png" alt="alt text"></p>
-<pre><code>svm= SVC(kernel='linear',probability=True)
+<pre><code class="language-python">svm= SVC(kernel='linear',probability=True)
 svm.fit(x_train_cv,y_train)
 pred=svm.predict(x_test_cv)
 accuracy_svm=accuracy_score(y_test,pred)
@@ -1197,7 +1186,7 @@ print(&quot;Accuracy of the SVC model:&quot;,accuracy_svm)
 </code></pre>
 <pre><code>Accuracy of the SVC model: 0.2975
 </code></pre>
-<pre><code>print(&quot;Classification report for SVM Model \n&quot;,classification_report(y_test,pred))
+<pre><code class="language-python">print(&quot;Classification report for SVM Model \n&quot;,classification_report(y_test,pred))
 </code></pre>
 <pre><code>Classification report for SVM Model 
                precision    recall  f1-score   support
@@ -1225,7 +1214,7 @@ weighted avg       0.26      0.30      0.25      4800
 <p>The next model we tested is the KNN model. It had the lowest accuracy among all other models.The k-nearest neighbors (KNN) algorithm is a supervised machine learning algorithm that can be used to solve both classification and regression problems.
 When we need to make a prediction, the k-most similar neighbors are located and an equivalent prediction is made. It is like forming a “majority vote” between the k most similar instances to a new unobserved instance. Similarity is the distance metric between two data points.</p>
 <p><img src="https://miro.medium.com/max/800/1*2zYNhLc522h0zftD1zDh2g.png" alt="alt text"></p>
-<pre><code>kNN = KNeighborsClassifier(n_neighbors=7)
+<pre><code class="language-python">kNN = KNeighborsClassifier(n_neighbors=7)
 kNN.fit(x_train_cv,y_train)
 pred_k = kNN.predict(x_test_cv)
 accuracy_knn = accuracy_score(y_test,pred_k)
@@ -1233,7 +1222,7 @@ print('Accuracy of KNN model',accuracy_knn)
 </code></pre>
 <pre><code>Accuracy of KNN model 0.21916666666666668
 </code></pre>
-<pre><code>print(&quot;Classification report for KNN model \n&quot;,classification_report(pred_k,value))
+<pre><code class="language-python">print(&quot;Classification report for KNN model \n&quot;,classification_report(pred_k,value))
 </code></pre>
 <pre><code>Classification report for KNN model 
                precision    recall  f1-score   support
@@ -1259,7 +1248,7 @@ weighted avg       0.33      0.32      0.27      4800
   _warn_prf(average, modifier, msg_start, len(result))
 </code></pre>
 <p>Our next and the last model that we used is the Ridge Classifier.We use the sklearn.linear_model library of scikit learn to import the Ridge Classifier.</p>
-<pre><code>clf=RidgeClassifier()
+<pre><code class="language-python">clf=RidgeClassifier()
 clf.fit(x_train_cv,y_train)
 pred1=clf.predict(x_test_cv)
 accuracy_ridge=accuracy_score(y_test,pred1)
@@ -1267,12 +1256,12 @@ print(&quot;Accuracy of the ridge classifier&quot;,accuracy_ridge)
 </code></pre>
 <pre><code>Accuracy of the ridge classifier 0.2833333333333333
 </code></pre>
-<pre><code>accuracy_all.append(accuracy_NB)
+<pre><code class="language-python">accuracy_all.append(accuracy_NB)
 accuracy_all.append(accuracy_svm)
 accuracy_all.append(accuracy_ridge)
 accuracy_all.append(accuracy_knn)
 </code></pre>
-<pre><code>import matplotlib.pyplot as plt
+<pre><code class="language-python">import matplotlib.pyplot as plt
 fig = plt.figure()
 ax = fig.add_axes([0,0,1,1])
 langs = ['NB', 'SVM', 'Ridge','KNN']
@@ -1286,14 +1275,14 @@ plt.show()
 <h1>Contribution</h1>
 Applying smoothing to our classifier and relaxing the problem can get us a better accuracy.
 We have a broad range of classes from 1 to 10. Smoothing is applied by allowing a difference of 1 between the predicted and the target classes
-<pre><code>def smoothing(predicted,actual):
+<pre><code class="language-python">def smoothing(predicted,actual):
   counter=0
   for i in range(len(predicted)):
     if(predicted[i]-actual[i]&lt;2):
       counter+=1
   return counter/len(predicted)
 </code></pre>
-<pre><code>acc_nb_smooth=smoothing(value,y_test)
+<pre><code class="language-python">acc_nb_smooth=smoothing(value,y_test)
 acc_svm_smooth=smoothing(pred,y_test)
 acc_ridge_smooth=smoothing(pred1,y_test)
 acc_knn_smooth=smoothing(pred_k,y_test)
@@ -1307,10 +1296,10 @@ print(acc_knn_smooth)
 0.78125
 0.783125
 </code></pre>
-<pre><code>accuracy_smooth=[]
+<pre><code class="language-python">accuracy_smooth=[]
 
 </code></pre>
-<pre><code>accuracy_smooth.append(accuracy_NB)
+<pre><code class="language-python">accuracy_smooth.append(accuracy_NB)
 accuracy_smooth.append(acc_nb_smooth)
 accuracy_smooth.append(accuracy_svm)
 accuracy_smooth.append(acc_svm_smooth)
@@ -1319,7 +1308,7 @@ accuracy_smooth.append(acc_ridge_smooth)
 accuracy_smooth.append(accuracy_knn)
 accuracy_smooth.append(acc_knn_smooth)
 </code></pre>
-<pre><code>print(&quot;MultinomialNB accuracy : {x:.2f} &quot;.format(x=accuracy_NB))
+<pre><code class="language-python">print(&quot;MultinomialNB accuracy : {x:.2f} &quot;.format(x=accuracy_NB))
 print(&quot;MultinomialNB accuracy after smoothing : {x:.2f} &quot;.format(x=acc_nb_smooth))
 
 print(&quot;SVM accuracy : {x:.2f} &quot;.format(x=accuracy_svm))
@@ -1335,7 +1324,7 @@ SVM accuracy after smoothing : 0.79
 Ridge accuracy : 0.28 
 Ridge accuracy after smoothing : 0.78 
 </code></pre>
-<pre><code>fig = plt.figure()
+<pre><code class="language-python">fig = plt.figure()
 ax = fig.add_axes([0,0,1,1])
 langs = ['NB','NBS','svm','svmS','rig','rigS','knn','knnS']
 students = accuracy_smooth
@@ -1346,10 +1335,10 @@ plt.show()
 <p><img src="./final_62_0.png" alt="png"></p>
 <p>We see that individual algorithms prove to be a little inefficient.Using the concept of Ensemble Learning I combine the fastest model with the most efficient model to see if there is an increase in the accuracy.Rather than making use of one model , a weighted model is used.</p>
 <p><img src="https://image.slidesharecdn.com/ensemblelearning-120730220523-phpapp02/95/ensemble-learning-the-wisdom-of-crowds-of-machines-15-728.jpg?cb=1343685993" alt="alt text"></p>
-<pre><code>EB = VotingClassifier(estimators=[('Linear',svm), ('Nb',model)])
+<pre><code class="language-python">EB = VotingClassifier(estimators=[('Linear',svm), ('Nb',model)])
 </code></pre>
 <p>Fitting our data to the model.A small problem can be that Linear SVM has a predict_prob function that is set to False by default , which we need to set to True</p>
-<pre><code>Ensemble.fit(x_train_cv,y_train)
+<pre><code class="language-python">Ensemble.fit(x_train_cv,y_train)
 </code></pre>
 <pre><code>VotingClassifier(estimators=[('Linear',
                               SVC(C=1.0, break_ties=False, cache_size=200,
@@ -1364,9 +1353,9 @@ plt.show()
                  flatten_transform=True, n_jobs=None, voting='hard',
                  weights=None)
 </code></pre>
-<pre><code>e_pred=Ensemble.predict(x_test_cv)
+<pre><code class="language-python">e_pred=Ensemble.predict(x_test_cv)
 </code></pre>
-<pre><code>acc3=accuracy_score(e_pred,y_test)
+<pre><code class="language-python">acc3=accuracy_score(e_pred,y_test)
 print(acc3)
 acc3_smooth=smoothing(e_pred,y_test)
 print(acc3_smooth)
@@ -1374,12 +1363,12 @@ print(acc3_smooth)
 <pre><code>0.29854166666666665
 0.7979166666666667
 </code></pre>
-<pre><code>print(&quot;Final accuracy on test data after applying smoothin and ensemble methods \n&quot;,acc3_smooth)
+<pre><code class="language-python">print(&quot;Final accuracy on test data after applying smoothin and ensemble methods \n&quot;,acc3_smooth)
 </code></pre>
 <pre><code>Final accuracy on test data after applying smoothin and ensemble methods 
  0.7979166666666667
 </code></pre>
-<pre><code>
+<pre><code class="language-python">
 </code></pre>
 <h1>Challenges and Contributions</h1>
 One of the more general challenges that I faced was tackling such a huge dataset.Using the method of sampling worked but had some variations in accuracy.Thus a more scaled data in terms of ratings did the job.
