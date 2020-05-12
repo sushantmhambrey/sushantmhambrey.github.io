@@ -5,12 +5,20 @@
     <link>https://sushantmhambrey.github.io/</link>
       <atom:link href="https://sushantmhambrey.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>Sushant Mhambrey</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 21 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 12 May 2020 01:23:36 -0500</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Sushant Mhambrey</title>
       <link>https://sushantmhambrey.github.io/</link>
     </image>
+    
+    <item>
+      <title>Final</title>
+      <link>https://sushantmhambrey.github.io/post/final/</link>
+      <pubDate>Tue, 12 May 2020 01:23:36 -0500</pubDate>
+      <guid>https://sushantmhambrey.github.io/post/final/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Naive Bayes from Scratch</title>
