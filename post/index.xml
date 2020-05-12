@@ -5,7 +5,7 @@
     <link>https://sushantmhambrey.github.io/post/</link>
       <atom:link href="https://sushantmhambrey.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 12 May 2020 01:23:36 -0500</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 12 May 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
       <title>Posts</title>
@@ -13,11 +13,758 @@
     </image>
     
     <item>
-      <title>Final</title>
+      <title>Data Mining Term Project</title>
       <link>https://sushantmhambrey.github.io/post/final/</link>
-      <pubDate>Tue, 12 May 2020 01:23:36 -0500</pubDate>
+      <pubDate>Tue, 12 May 2020 00:00:00 +0000</pubDate>
       <guid>https://sushantmhambrey.github.io/post/final/</guid>
-      <description></description>
+      <description>&lt;h1 &gt;**Data Mining Project Spring 2020**&lt;/h1&gt;
+&lt;p&gt;The purpose of the term project is to predict the ratings given a particular review. Throughout the implementation of the term project many models were tested and based on the various evaluation metrics a model was selected. The dataset is taken from Kaggle BGG review dataset . Due to the vast length of dataset Google Colaboratory was used as the implementation platform&lt;p&gt;
+&lt;pre&gt;&lt;code&gt;#Linking colab to google drive where the dataset is saved
+from google.colab import drive
+import zipfile
+#Mount the drive
+drive.mount(&#39;/content/gdrive&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Drive already mounted at /content/gdrive; to attempt to forcibly remount, call drive.mount(&amp;quot;/content/gdrive&amp;quot;, force_remount=True).
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Extracting tar file using zipfile module. We have a huge dataset (around 13 million rows)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;zip_ref = zipfile.ZipFile(&amp;quot;/content/gdrive/My Drive/Colab Notebooks/bgg-13m-reviews.zip&amp;quot;, &#39;r&#39;)
+zip_ref.extractall(&amp;quot;/tmp&amp;quot;)
+zip_ref.close()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt; Importing the necessary libraries &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import numpy as np
+import pandas as pd
+import string 
+import re 
+import nltk
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import plot_confusion_matrix
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Specifying the path where the csv file is stored&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;path=&#39;/tmp/bgg-13m-reviews.csv&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Reading the csv file as a data frame using the pandas module.In the read_csv we can specify nrows which indicates how many rows need to be read&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df = pd.read_csv(path, delimiter=&#39;,&#39;)
+nRow, nCol = df.shape
+#print(f&#39;There are {nRow} rows and {nCol} columns&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first part of the project is just analysis of the data file to see how the ratings class is spread. The spread is quite lobsided toward a seven rating which is tackled later in the notebook. Textual data like the comment section of the BGG requires a considerable ammount of preprocessing. Cleaning techniques like removal of punctuation, returing string.lower() and removal of NaN values is used.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df=df.dropna()
+#print(df.count())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Seeing how our data frame looks like.The two main columns we are going to use in the project are comment and rating.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df.head()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Unnamed: 0&lt;/th&gt;
+      &lt;th&gt;user&lt;/th&gt;
+      &lt;th&gt;rating&lt;/th&gt;
+      &lt;th&gt;comment&lt;/th&gt;
+      &lt;th&gt;ID&lt;/th&gt;
+      &lt;th&gt;name&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;dougthonus&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;Currently, this sits on my list as my favorite...&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;cypar7&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;I know it says how many plays, but many, many ...&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;7&lt;/th&gt;
+      &lt;td&gt;7&lt;/td&gt;
+      &lt;td&gt;hreimer&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;i will never tire of this game.. Awesome&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;11&lt;/th&gt;
+      &lt;td&gt;11&lt;/td&gt;
+      &lt;td&gt;daredevil&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;This is probably the best game I ever played. ...&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;16&lt;/th&gt;
+      &lt;td&gt;16&lt;/td&gt;
+      &lt;td&gt;hurkle&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;Fantastic game. Got me hooked on games all ove...&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;df[&#39;rating&#39;].hist(bins=10)
+plt.xlabel(&#39;rating of review&#39;)
+plt.ylabel(&#39;number of reviews&#39;)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_14_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;plt.figure(figsize=(20, 7))
+df[&#39;name&#39;].value_counts()[:30].plot(kind=&#39;bar&#39;,color=&amp;quot;skyblue&amp;quot;)
+plt.ylabel(&#39;Count of Rating&#39;)
+plt.title(&#39;Top 30 Rated Games&#39;)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_15_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from wordcloud import WordCloud
+text = df.comment[0]
+
+# Create and generate a word cloud image:
+wordcloud = WordCloud(width=400,background_color=&#39;black&#39;).generate(text)
+
+# Display the generated image:
+plt.imshow(wordcloud, interpolation=&#39;bilinear&#39;)
+plt.axis(&amp;quot;off&amp;quot;)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_16_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from nltk.corpus import stopwords
+from sklearn.feature_extraction import text
+stop = text.ENGLISH_STOP_WORDS
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Preprocessing the text. We remove white spaces, punctuations, stopwords and make the string lowercase&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;def remove_noise(text):
+    
+    text = text.apply(lambda x: &amp;quot; &amp;quot;.join(x.lower() for x in x.split()))
+    
+    text = text.apply(lambda x: &amp;quot; &amp;quot;.join(x.strip() for x in x.split()))
+    
+    text = text.str.replace(&#39;[^\w\s]&#39;, &#39;&#39;)
+
+    text = text.apply(lambda x: &#39; &#39;.join([word for word in x.split() if word not in (stop)]))
+        
+    return text
+df[&#39;comment&#39;] = remove_noise(df[&#39;comment&#39;])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Checking the dataframe after cleaning&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df.head()
+#print(df.info())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;Unnamed: 0&lt;/th&gt;
+      &lt;th&gt;user&lt;/th&gt;
+      &lt;th&gt;rating&lt;/th&gt;
+      &lt;th&gt;comment&lt;/th&gt;
+      &lt;th&gt;ID&lt;/th&gt;
+      &lt;th&gt;name&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;2&lt;/td&gt;
+      &lt;td&gt;dougthonus&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;currently sits list favorite game&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;3&lt;/td&gt;
+      &lt;td&gt;cypar7&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;know says plays uncounted liked version best&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;7&lt;/th&gt;
+      &lt;td&gt;7&lt;/td&gt;
+      &lt;td&gt;hreimer&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;tire game awesome&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;11&lt;/th&gt;
+      &lt;td&gt;11&lt;/td&gt;
+      &lt;td&gt;daredevil&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;probably best game played requires just thinki...&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;16&lt;/th&gt;
+      &lt;td&gt;16&lt;/td&gt;
+      &lt;td&gt;hurkle&lt;/td&gt;
+      &lt;td&gt;10.0&lt;/td&gt;
+      &lt;td&gt;fantastic game got hooked games&lt;/td&gt;
+      &lt;td&gt;13&lt;/td&gt;
+      &lt;td&gt;Catan&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;def get_top_n_words(corpus, n=None):
+    vec = CountVectorizer(stop_words = &#39;english&#39;).fit(corpus)
+    bag_of_words = vec.transform(corpus)
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
+    return words_freq[:n]
+common_words = get_top_n_words(df[&#39;comment&#39;], 30)
+for word, freq in common_words:
+    #print(word, freq)
+  df2 = pd.DataFrame(common_words, columns = [&#39;ReviewText&#39; , &#39;count&#39;])
+#df2.groupby(&#39;ReviewText&#39;).sum()[&#39;count&#39;].sort_values(ascending=False).iplot(
+#kind=&#39;bar&#39;, yTitle=&#39;Count&#39;, linecolor=&#39;black&#39;, title=&#39;Top 20 words in review after removing stop words&#39;)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we can see , after removing the stopwords these are our top 30 words&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+&lt;style scoped&gt;
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&lt;pre&gt;&lt;code&gt;.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;/style&gt;&lt;/p&gt;
+&lt;table border=&#34;1&#34; class=&#34;dataframe&#34;&gt;
+  &lt;thead&gt;
+    &lt;tr style=&#34;text-align: right;&#34;&gt;
+      &lt;th&gt;&lt;/th&gt;
+      &lt;th&gt;ReviewText&lt;/th&gt;
+      &lt;th&gt;count&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th&gt;0&lt;/th&gt;
+      &lt;td&gt;game&lt;/td&gt;
+      &lt;td&gt;2539119&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;1&lt;/th&gt;
+      &lt;td&gt;play&lt;/td&gt;
+      &lt;td&gt;743697&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;2&lt;/th&gt;
+      &lt;td&gt;like&lt;/td&gt;
+      &lt;td&gt;520940&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;3&lt;/th&gt;
+      &lt;td&gt;fun&lt;/td&gt;
+      &lt;td&gt;517789&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;4&lt;/th&gt;
+      &lt;td&gt;good&lt;/td&gt;
+      &lt;td&gt;398781&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;5&lt;/th&gt;
+      &lt;td&gt;games&lt;/td&gt;
+      &lt;td&gt;392353&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;6&lt;/th&gt;
+      &lt;td&gt;players&lt;/td&gt;
+      &lt;td&gt;369127&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;7&lt;/th&gt;
+      &lt;td&gt;really&lt;/td&gt;
+      &lt;td&gt;359752&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;8&lt;/th&gt;
+      &lt;td&gt;played&lt;/td&gt;
+      &lt;td&gt;353415&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;9&lt;/th&gt;
+      &lt;td&gt;great&lt;/td&gt;
+      &lt;td&gt;329474&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;10&lt;/th&gt;
+      &lt;td&gt;just&lt;/td&gt;
+      &lt;td&gt;325831&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;11&lt;/th&gt;
+      &lt;td&gt;cards&lt;/td&gt;
+      &lt;td&gt;318786&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;12&lt;/th&gt;
+      &lt;td&gt;time&lt;/td&gt;
+      &lt;td&gt;267260&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;13&lt;/th&gt;
+      &lt;td&gt;player&lt;/td&gt;
+      &lt;td&gt;243939&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;14&lt;/th&gt;
+      &lt;td&gt;rules&lt;/td&gt;
+      &lt;td&gt;206405&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;15&lt;/th&gt;
+      &lt;td&gt;playing&lt;/td&gt;
+      &lt;td&gt;205275&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;16&lt;/th&gt;
+      &lt;td&gt;little&lt;/td&gt;
+      &lt;td&gt;197550&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;17&lt;/th&gt;
+      &lt;td&gt;card&lt;/td&gt;
+      &lt;td&gt;196163&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;18&lt;/th&gt;
+      &lt;td&gt;dont&lt;/td&gt;
+      &lt;td&gt;194497&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;19&lt;/th&gt;
+      &lt;td&gt;plays&lt;/td&gt;
+      &lt;td&gt;190899&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;20&lt;/th&gt;
+      &lt;td&gt;lot&lt;/td&gt;
+      &lt;td&gt;186532&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;21&lt;/th&gt;
+      &lt;td&gt;better&lt;/td&gt;
+      &lt;td&gt;185508&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;22&lt;/th&gt;
+      &lt;td&gt;theme&lt;/td&gt;
+      &lt;td&gt;174505&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;23&lt;/th&gt;
+      &lt;td&gt;bit&lt;/td&gt;
+      &lt;td&gt;172440&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;24&lt;/th&gt;
+      &lt;td&gt;interesting&lt;/td&gt;
+      &lt;td&gt;169584&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;25&lt;/th&gt;
+      &lt;td&gt;nice&lt;/td&gt;
+      &lt;td&gt;165569&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;26&lt;/th&gt;
+      &lt;td&gt;love&lt;/td&gt;
+      &lt;td&gt;162851&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;27&lt;/th&gt;
+      &lt;td&gt;think&lt;/td&gt;
+      &lt;td&gt;162404&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;28&lt;/th&gt;
+      &lt;td&gt;best&lt;/td&gt;
+      &lt;td&gt;145424&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;th&gt;29&lt;/th&gt;
+      &lt;td&gt;simple&lt;/td&gt;
+      &lt;td&gt;143521&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;df2[&#39;ReviewText&#39;].value_counts()[:30].plot(kind=&#39;bar&#39;,color=&amp;quot;skyblue&amp;quot;)
+plt.xlabel(&#39;rating of review&#39;)
+plt.ylabel(&#39;number of reviews&#39;)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_25_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#counting the number of ratings to each number
+from collections import Counter
+rate = df[&#39;rating&#39;].values
+rate=rate.astype(int)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our data is arranged such that all the ratings are in ascending order thus we need to shuffle the data before splitting into training and test sets&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;df = df.sample(frac=1).reset_index(drop=True)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;df1=df.sample(n=16000)
+print(df1.count())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Unnamed: 0    16000
+user          16000
+rating        16000
+comment       16000
+ID            16000
+name          16000
+dtype: int64
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Assigning &amp;lsquo;x&amp;rsquo; to the comment section and &amp;lsquo;y&amp;rsquo; to the rating section of our data frame&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;x=df1[&#39;comment&#39;].values
+y=np.round(df1[&#39;rating&#39;].values)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Just a look at how our X_test looks. We need to vectorise the data because ML models require vector represenation of texts&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;X_test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;array([&#39;solo good players 8 3 players 65 4 players unplayable like wheel whitout classic boring card game unfortunately like control strategy play game player 34 uncontrollable strongly recommend play excellent materials&#39;,
+       &#39;old town solo&#39;,
+       &#39;neutral occasion huge toyparty value good production quality game merely ok feels like doesnt realize potentialof game idea suspect replayability novelty value&#39;,
+       ...,
+       &#39;fun chillout warmup game simple rules allow quick learnasyouplay plenty replayability character significantly overpowering decent strategy simple game fun ages issue game elimination player left watch rest battle code fairplay fun stopping ganging single character player sit rest gametime&#39;,
+       &#39;auction&#39;,
+       &#39;great light dexterity game play kids definitely takes skill especially lanes like shallow troughs instead flat game equalized somewhat played 4 players making lane longer different ways play game nice supports 24 players&#39;],
+      dtype=object)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For textutal data to be processed it needs to be coverted into a vector matrix representation.But just calculating the count(or frequency) of the terms might result in percieving all the terms as equally important. The TF-IDF vectorizer attenuates the terms whose occurence is common and not of much relevance and gives importance to more relevant terms.Mathematically speaking Tf is ratio of number of times a word occurred in a document to the total number of words in the document. and IDF is the log of total docs divided by docs containing the word.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.joyofdata.de/blog/wp-content/uploads/2014/02/tf-idf.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Vectorising the data&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vect = TfidfVectorizer(stop_words = &#39;english&#39;,max_df=0.7,max_features=10000)
+x_train_cv = vect.fit_transform(X_train)
+x_test_cv = vect.transform(X_test)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Trying of the different ML modules now&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import RidgeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.externals import joblib
+from sklearn.ensemble import VotingClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;accuracy_all=[]
+print(accuracy_all)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our first model is Multinomial Naive Bayes.
+One of the most simple Naive Bayes model is the Gaussian Naive Bayes model because it works under the assumption that the data is decribed by the Gaussian distribution but there is also Multinomial Naive Bayes that can be used to get the generative distribution within each label.Here the features are assumed to be generated from a simple multinomia distribution. It is suitale for features that have counts(like ratings in our data) because it describes the probability of observing count among number of various categories.&lt;/p&gt;
+&lt;p&gt;$$
+P(c|d) =P(c) \prod_{k=1}^n P(t_k|c)
+$$&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#Implementing MultinomialNB
+model = MultinomialNB()
+model.fit(x_train_cv, y_train.astype(&#39;int&#39;))
+value = model.predict(x_test_cv)
+accuracy_NB=accuracy_score(y_test,value)
+print(&amp;quot;accuracy of Naive Bayes&amp;quot;,accuracy_NB)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;accuracy of Naive Bayes 0.2914583333333333
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;
+disp=plot_confusion_matrix(model, x_test_cv, y_test)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_43_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;print(&amp;quot;Classification report for Multinomial Naive Bayes \n&amp;quot;,classification_report(y_test,value))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Classification report for Multinomial Naive Bayes 
+               precision    recall  f1-score   support
+
+         1.0       0.00      0.00      0.00        29
+         2.0       0.00      0.00      0.00        75
+         3.0       0.00      0.00      0.00       124
+         4.0       0.00      0.00      0.00       271
+         5.0       0.00      0.00      0.00       359
+         6.0       0.30      0.23      0.26       967
+         7.0       0.28      0.23      0.25      1059
+         8.0       0.29      0.77      0.42      1204
+         9.0       0.00      0.00      0.00       445
+        10.0       0.00      0.00      0.00       267
+
+    accuracy                           0.29      4800
+   macro avg       0.09      0.12      0.09      4800
+weighted avg       0.20      0.29      0.22      4800
+
+
+
+/usr/local/lib/python3.6/dist-packages/sklearn/metrics/_classification.py:1272: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The next model we use is the Support Vector Machine methodolgy. SVM model is mostly used for discriminative classification as opposed to generative classification.We use the scikit learns SVM module to train our model.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/SVM_margin.png/300px-SVM_margin.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;svm= SVC(kernel=&#39;linear&#39;,probability=True)
+svm.fit(x_train_cv,y_train)
+pred=svm.predict(x_test_cv)
+accuracy_svm=accuracy_score(y_test,pred)
+print(&amp;quot;Accuracy of the SVC model:&amp;quot;,accuracy_svm)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Accuracy of the SVC model: 0.2975
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;print(&amp;quot;Classification report for SVM Model \n&amp;quot;,classification_report(y_test,pred))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Classification report for SVM Model 
+               precision    recall  f1-score   support
+
+         1.0       0.00      0.00      0.00        29
+         2.0       0.00      0.00      0.00        75
+         3.0       0.00      0.00      0.00       124
+         4.0       0.16      0.02      0.03       271
+         5.0       0.16      0.03      0.05       359
+         6.0       0.29      0.37      0.33       967
+         7.0       0.28      0.32      0.30      1059
+         8.0       0.32      0.58      0.41      1204
+         9.0       0.22      0.01      0.03       445
+        10.0       0.26      0.04      0.08       267
+
+    accuracy                           0.30      4800
+   macro avg       0.17      0.14      0.12      4800
+weighted avg       0.26      0.30      0.25      4800
+
+
+
+/usr/local/lib/python3.6/dist-packages/sklearn/metrics/_classification.py:1272: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The next model we tested is the KNN model. It had the lowest accuracy among all other models.The k-nearest neighbors (KNN) algorithm is a supervised machine learning algorithm that can be used to solve both classification and regression problems.
+When we need to make a prediction, the k-most similar neighbors are located and an equivalent prediction is made. It is like forming a “majority vote” between the k most similar instances to a new unobserved instance. Similarity is the distance metric between two data points.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://miro.medium.com/max/800/1*2zYNhLc522h0zftD1zDh2g.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kNN = KNeighborsClassifier(n_neighbors=7)
+kNN.fit(x_train_cv,y_train)
+pred_k = kNN.predict(x_test_cv)
+accuracy_knn = accuracy_score(y_test,pred_k)
+print(&#39;Accuracy of KNN model&#39;,accuracy_knn)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Accuracy of KNN model 0.21916666666666668
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;print(&amp;quot;Classification report for KNN model \n&amp;quot;,classification_report(pred_k,value))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Classification report for KNN model 
+               precision    recall  f1-score   support
+
+         1.0       0.00      0.00      0.00         1
+         2.0       0.00      0.00      0.00        12
+         3.0       0.00      0.00      0.00        39
+         4.0       0.00      0.00      0.00       130
+         5.0       1.00      0.01      0.01       178
+         6.0       0.28      0.18      0.22      1160
+         7.0       0.38      0.20      0.26      1659
+         8.0       0.31      0.69      0.42      1410
+         9.0       0.00      0.00      0.00       161
+        10.0       0.00      0.00      0.00        50
+
+    accuracy                           0.32      4800
+   macro avg       0.20      0.11      0.09      4800
+weighted avg       0.33      0.32      0.27      4800
+
+
+
+/usr/local/lib/python3.6/dist-packages/sklearn/metrics/_classification.py:1272: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Our next and the last model that we used is the Ridge Classifier.We use the sklearn.linear_model library of scikit learn to import the Ridge Classifier.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;clf=RidgeClassifier()
+clf.fit(x_train_cv,y_train)
+pred1=clf.predict(x_test_cv)
+accuracy_ridge=accuracy_score(y_test,pred1)
+print(&amp;quot;Accuracy of the ridge classifier&amp;quot;,accuracy_ridge)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Accuracy of the ridge classifier 0.2833333333333333
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;accuracy_all.append(accuracy_NB)
+accuracy_all.append(accuracy_svm)
+accuracy_all.append(accuracy_ridge)
+accuracy_all.append(accuracy_knn)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;import matplotlib.pyplot as plt
+fig = plt.figure()
+ax = fig.add_axes([0,0,1,1])
+langs = [&#39;NB&#39;, &#39;SVM&#39;, &#39;Ridge&#39;,&#39;KNN&#39;]
+students = accuracy_all
+ax.bar(langs,students)
+plt.ylim(0,0.4,0.01)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_55_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;We see that almost all the classifiers have the same accuraccy and even though SVM performs better , it takes a lot of time to process even on small datasets&lt;/p&gt;
+&lt;h1&gt;Contribution&lt;/h1&gt;
+Applying smoothing to our classifier and relaxing the problem can get us a better accuracy.
+We have a broad range of classes from 1 to 10. Smoothing is applied by allowing a difference of 1 between the predicted and the target classes
+&lt;pre&gt;&lt;code&gt;def smoothing(predicted,actual):
+  counter=0
+  for i in range(len(predicted)):
+    if(predicted[i]-actual[i]&amp;lt;2):
+      counter+=1
+  return counter/len(predicted)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;acc_nb_smooth=smoothing(value,y_test)
+acc_svm_smooth=smoothing(pred,y_test)
+acc_ridge_smooth=smoothing(pred1,y_test)
+acc_knn_smooth=smoothing(pred_k,y_test)
+print(acc_nb_smooth)
+print(acc_svm_smooth)
+print(acc_ridge_smooth)
+print(acc_knn_smooth)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.7316666666666667
+0.7908333333333334
+0.78125
+0.783125
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;accuracy_smooth=[]
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;accuracy_smooth.append(accuracy_NB)
+accuracy_smooth.append(acc_nb_smooth)
+accuracy_smooth.append(accuracy_svm)
+accuracy_smooth.append(acc_svm_smooth)
+accuracy_smooth.append(accuracy_ridge)
+accuracy_smooth.append(acc_ridge_smooth)
+accuracy_smooth.append(accuracy_knn)
+accuracy_smooth.append(acc_knn_smooth)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;print(&amp;quot;MultinomialNB accuracy : {x:.2f} &amp;quot;.format(x=accuracy_NB))
+print(&amp;quot;MultinomialNB accuracy after smoothing : {x:.2f} &amp;quot;.format(x=acc_nb_smooth))
+
+print(&amp;quot;SVM accuracy : {x:.2f} &amp;quot;.format(x=accuracy_svm))
+print(&amp;quot;SVM accuracy after smoothing : {x:.2f} &amp;quot;.format(x=acc_svm_smooth))
+
+print(&amp;quot;Ridge accuracy : {x:.2f} &amp;quot;.format(x=accuracy_ridge))
+print(&amp;quot;Ridge accuracy after smoothing : {x:.2f} &amp;quot;.format(x=acc_ridge_smooth))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;MultinomialNB accuracy : 0.29 
+MultinomialNB accuracy after smoothing : 0.73 
+SVM accuracy : 0.30 
+SVM accuracy after smoothing : 0.79 
+Ridge accuracy : 0.28 
+Ridge accuracy after smoothing : 0.78 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;fig = plt.figure()
+ax = fig.add_axes([0,0,1,1])
+langs = [&#39;NB&#39;,&#39;NBS&#39;,&#39;svm&#39;,&#39;svmS&#39;,&#39;rig&#39;,&#39;rigS&#39;,&#39;knn&#39;,&#39;knnS&#39;]
+students = accuracy_smooth
+ax.bar(langs,students)
+plt.ylim(0,1)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;./final_62_0.png&#34; alt=&#34;png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;We see that individual algorithms prove to be a little inefficient.Using the concept of Ensemble Learning I combine the fastest model with the most efficient model to see if there is an increase in the accuracy.Rather than making use of one model , a weighted model is used.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://image.slidesharecdn.com/ensemblelearning-120730220523-phpapp02/95/ensemble-learning-the-wisdom-of-crowds-of-machines-15-728.jpg?cb=1343685993&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;EB = VotingClassifier(estimators=[(&#39;Linear&#39;,svm), (&#39;Nb&#39;,model)])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Fitting our data to the model.A small problem can be that Linear SVM has a predict_prob function that is set to False by default , which we need to set to True&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Ensemble.fit(x_train_cv,y_train)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;VotingClassifier(estimators=[(&#39;Linear&#39;,
+                              SVC(C=1.0, break_ties=False, cache_size=200,
+                                  class_weight=None, coef0=0.0,
+                                  decision_function_shape=&#39;ovr&#39;, degree=3,
+                                  gamma=&#39;scale&#39;, kernel=&#39;linear&#39;, max_iter=-1,
+                                  probability=True, random_state=None,
+                                  shrinking=True, tol=0.001, verbose=False)),
+                             (&#39;Nb&#39;,
+                              MultinomialNB(alpha=1.0, class_prior=None,
+                                            fit_prior=True))],
+                 flatten_transform=True, n_jobs=None, voting=&#39;hard&#39;,
+                 weights=None)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;e_pred=Ensemble.predict(x_test_cv)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;acc3=accuracy_score(e_pred,y_test)
+print(acc3)
+acc3_smooth=smoothing(e_pred,y_test)
+print(acc3_smooth)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;0.29854166666666665
+0.7979166666666667
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;print(&amp;quot;Final accuracy on test data after applying smoothin and ensemble methods \n&amp;quot;,acc3_smooth)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;Final accuracy on test data after applying smoothin and ensemble methods 
+ 0.7979166666666667
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1&gt;Challenges and Contributions&lt;/h1&gt;
+One of the more general challenges that I faced was tackling such a huge dataset.Using the method of sampling worked but had some variations in accuracy.Thus a more scaled data in terms of ratings did the job.
+Some specific challenge that I faced was to decide whether to use Word2Vec word embedding model. On further testing , it was seen that word embeddings actually created a lower accuracy.Doc2Vec word embeddings could have worked on the larger dataset if the accurate computation was present.On smaller dataset though, it made no difference. While creating ensembles,parameters of the individual models had to be tuned and dimensions had to be adjusted to properly fit our input to the model.Applying smoothing was one more contribution which helped to increase the accuracy.Had to relax certain terms of the model for that.
+Even though the database is large , it is more lobsided toward the ratings of 6 7 8 and scaling down the data does the trick.Overall, working on the dataset helped to understand key concepts from simple terms like creating charts of top 20 words or scaling down the data to more complex methodologies like smoothing and ensembles.
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://towardsdatascience.com/review-rating-prediction-a-combined-approach-538c617c495c&#34;&gt;https://towardsdatascience.com/review-rating-prediction-a-combined-approach-538c617c495c&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://towardsdatascience.com/ensemble-methods-in-machine-learning-what-are-they-and-why-use-them-68ec3f9fef5f&#34;&gt;https://towardsdatascience.com/ensemble-methods-in-machine-learning-what-are-they-and-why-use-them-68ec3f9fef5f&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.kaggle.com/josh24990/nlp-ml-which-words-predict-a-recommendation&#34;&gt;https://www.kaggle.com/josh24990/nlp-ml-which-words-predict-a-recommendation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.developintelligence.com/blog/2017/03/predicting-yelp-star-ratings-review-text-python/&#34;&gt;https://www.developintelligence.com/blog/2017/03/predicting-yelp-star-ratings-review-text-python/&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
     </item>
     
     <item>
